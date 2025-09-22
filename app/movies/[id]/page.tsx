@@ -5,21 +5,32 @@ import { Movie } from "@/lib/google-sheets";
 import VideoPlayer from "@/components/VideoPlayer";
 
 interface MovieDetailProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function MovieDetail({ params }: MovieDetailProps) {
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [movieId, setMovieId] = useState<string | null>(null);
 
   useEffect(() => {
+    const getParams = async () => {
+      const resolvedParams = await params;
+      setMovieId(resolvedParams.id);
+    };
+    getParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (!movieId) return;
+
     const fetchMovie = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/movies/${params.id}`);
+        const response = await fetch(`/api/movies/${movieId}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch movie");
@@ -35,7 +46,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
     };
 
     fetchMovie();
-  }, [params.id]);
+  }, [movieId]);
 
   if (loading) {
     return (
