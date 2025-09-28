@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
 
     // Validate pagination parameters
-    if (page < 1 || limit < 1 || limit > 100) {
+    if (page < 1 || limit < 1 || limit > 50) {
       return NextResponse.json(
         { error: "Invalid pagination parameters" },
         { status: 400 }
@@ -90,6 +90,9 @@ export async function GET(request: NextRequest) {
       page,
       limit,
       total,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page < Math.ceil(total / limit),
+      hasPrevPage: page > 1,
       data,
     });
   } catch (error) {

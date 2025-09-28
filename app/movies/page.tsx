@@ -22,6 +22,9 @@ interface MoviesResponse {
   page: number;
   limit: number;
   total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
   data: Movie[];
 }
 
@@ -29,27 +32,31 @@ export default function MoviesPage() {
   const [movies, setMovies] = useState<MoviesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchMovies = async (page: number = 1) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/movies?page=${page}&limit=12`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch movies");
+      }
+
+      const data = await response.json();
+      setMovies(data);
+      setTotalPages(data.totalPages);
+      setCurrentPage(page);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/movies?page=1&limit=12");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch movies");
-        }
-
-        const data = await response.json();
-        setMovies(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMovies();
+    fetchMovies(1);
   }, []);
 
   const handlePlay = (movie: Movie) => {
@@ -229,6 +236,22 @@ export default function MoviesPage() {
         <div
           style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
         >
+          {/* Pagination Info */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "2rem",
+              color: "#9ca3af",
+            }}
+          >
+            <p>
+              Trang {currentPage} / {totalPages} - Tổng {movies?.total || 0}{" "}
+              phim
+            </p>
+          </div>
+
           <div
             style={{
               display: "grid",
@@ -446,6 +469,142 @@ export default function MoviesPage() {
               </div>
             ))}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "1rem",
+                marginTop: "3rem",
+              }}
+            >
+              <button
+                onClick={() => fetchMovies(currentPage - 1)}
+                disabled={currentPage === 1}
+                style={{
+                  padding: "0.75rem",
+                  backgroundColor: currentPage === 1 ? "#374151" : "#dc2626",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "0.5rem",
+                  cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                  fontSize: "1.2rem",
+                  fontWeight: "500",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "3rem",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (currentPage !== 1) {
+                    e.currentTarget.style.backgroundColor = "#b91c1c";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== 1) {
+                    e.currentTarget.style.backgroundColor = "#dc2626";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }
+                }}
+              >
+                ‹
+              </button>
+
+              {/* Page Numbers */}
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => fetchMovies(pageNum)}
+                      style={{
+                        padding: "0.75rem 1rem",
+                        backgroundColor:
+                          currentPage === pageNum ? "#dc2626" : "#374151",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "0.5rem",
+                        cursor: "pointer",
+                        fontSize: "1rem",
+                        fontWeight: "500",
+                        minWidth: "3rem",
+                        transition: "all 0.3s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentPage !== pageNum) {
+                          e.currentTarget.style.backgroundColor = "#4b5563";
+                          e.currentTarget.style.transform = "scale(1.05)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentPage !== pageNum) {
+                          e.currentTarget.style.backgroundColor = "#374151";
+                          e.currentTarget.style.transform = "scale(1)";
+                        }
+                      }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => fetchMovies(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: "0.75rem",
+                  backgroundColor:
+                    currentPage === totalPages ? "#374151" : "#dc2626",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "0.5rem",
+                  cursor:
+                    currentPage === totalPages ? "not-allowed" : "pointer",
+                  fontSize: "1.2rem",
+                  fontWeight: "500",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "3rem",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  if (currentPage !== totalPages) {
+                    e.currentTarget.style.backgroundColor = "#b91c1c";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== totalPages) {
+                    e.currentTarget.style.backgroundColor = "#dc2626";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }
+                }}
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
