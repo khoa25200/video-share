@@ -15,6 +15,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [movieId, setMovieId] = useState<string | null>(null);
+  const [relatedEpisodes, setRelatedEpisodes] = useState<Movie[]>([]);
 
   useEffect(() => {
     const getParams = async () => {
@@ -38,6 +39,29 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
         const data = await response.json();
         setMovie(data);
+
+        // Fetch related episodes if this movie has a series
+        if (data.series) {
+          try {
+            const episodesResponse = await fetch(
+              `/api/movies?series=${encodeURIComponent(data.series)}`
+            );
+            if (episodesResponse.ok) {
+              const episodesData = await episodesResponse.json();
+              // Sort episodes by episode number
+              const sortedEpisodes = episodesData.data.sort(
+                (a: Movie, b: Movie) => {
+                  const episodeA = parseInt(a.episode || "0");
+                  const episodeB = parseInt(b.episode || "0");
+                  return episodeA - episodeB;
+                }
+              );
+              setRelatedEpisodes(sortedEpisodes);
+            }
+          } catch (err) {
+            console.error("Failed to fetch related episodes:", err);
+          }
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
       } finally {
@@ -389,6 +413,86 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           <h2 className="text-2xl font-bold text-white mb-6">Xem phim</h2>
           <VideoPlayer movie={movie} />
         </div>
+
+        {/* Related Episodes Section */}
+        {relatedEpisodes.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              📺 {movie.series} - Tất cả tập
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+              {relatedEpisodes.map((episode) => (
+                <div
+                  key={episode.id}
+                  className={`bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
+                    episode.id === movie.id
+                      ? "border-primary-500 ring-2 ring-primary-500/20"
+                      : "border-dark-700 hover:border-primary-500/50"
+                  }`}
+                  onClick={() => {
+                    window.location.href = `/movies/${episode.id}`;
+                  }}
+                >
+                  {/* Episode Thumbnail */}
+                  <div
+                    className="aspect-[3/4] relative"
+                    style={{
+                      backgroundImage: `url(${episode.thumbnail})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  >
+                    {/* Episode Badge */}
+                    <div className="absolute top-2 left-2 bg-primary-600 text-white px-2 py-1 rounded text-xs font-bold">
+                      Tập {episode.episode}
+                    </div>
+
+                    {/* Current Episode Indicator */}
+                    {episode.id === movie.id && (
+                      <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-bold">
+                        Đang xem
+                      </div>
+                    )}
+
+                    {/* Play Overlay */}
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
+                      <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-white ml-0.5"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Episode Info */}
+                  <div className="p-3">
+                    <h3 className="text-white text-sm font-medium line-clamp-2 mb-1">
+                      {episode.title}
+                    </h3>
+                    <div className="flex items-center justify-between text-xs text-gray-400">
+                      <span>{episode.duration}</span>
+                      <span
+                        className={`px-2 py-1 rounded ${
+                          episode.status === "END"
+                            ? "bg-green-600/20 text-green-400"
+                            : "bg-yellow-600/20 text-yellow-400"
+                        }`}
+                      >
+                        {episode.status === "END"
+                          ? "Hoàn thành"
+                          : episode.status}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

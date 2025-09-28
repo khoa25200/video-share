@@ -16,6 +16,8 @@ export interface Movie {
   iframe: string;
   thumbnail: string;
   videoUrl?: string; // Optional video URL for MP4/M3U8 files
+  series?: string; // Series name for grouping
+  episode?: string; // Episode number within series
 }
 
 // Khởi tạo Google Sheets API client
@@ -61,7 +63,7 @@ export async function getSheetData(): Promise<Movie[]> {
 
     // Xác định range để lấy dữ liệu
     const sheetName = process.env.GOOGLE_SHEET_NAME || "Trang tính1";
-    const range = `${sheetName}!A:N`; // Lấy từ cột A đến N (14 cột) - bao gồm thumbnail và videoUrl
+    const range = `${sheetName}!A:P`; // Lấy từ cột A đến P (16 cột) - bao gồm series và episode
 
     // Lấy dữ liệu từ sheet
     const requestOptions: any = {
@@ -106,7 +108,9 @@ export async function getSheetData(): Promise<Movie[]> {
           description: "description",
           iframe: "iframe",
           thumbnail: "thumbnail",
-          videoUrl: "videoUrl", // Added videoUrl to keyMap
+          videoUrl: "videoUrl",
+          series: "series",
+          episode: "episode",
         };
 
         const key = keyMap[header] || header.toLowerCase().replace(/\s+/g, "");

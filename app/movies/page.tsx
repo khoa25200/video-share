@@ -16,6 +16,8 @@ interface Movie {
   description: string;
   iframe: string;
   thumbnail: string;
+  series?: string;
+  episode?: string;
 }
 
 interface MoviesResponse {
@@ -34,6 +36,10 @@ export default function MoviesPage() {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [viewMode, setViewMode] = useState<"grid" | "series">("grid");
+  const [groupedMovies, setGroupedMovies] = useState<{
+    [key: string]: Movie[];
+  }>({});
 
   const fetchMovies = async (page: number = 1) => {
     try {
@@ -48,6 +54,30 @@ export default function MoviesPage() {
       setMovies(data);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
+
+      // Group movies by series
+      const grouped = data.data.reduce(
+        (acc: { [key: string]: Movie[] }, movie: Movie) => {
+          const seriesKey = movie.series || "Đơn lẻ";
+          if (!acc[seriesKey]) {
+            acc[seriesKey] = [];
+          }
+          acc[seriesKey].push(movie);
+          return acc;
+        },
+        {}
+      );
+
+      // Sort episodes within each series
+      Object.keys(grouped).forEach((seriesKey) => {
+        grouped[seriesKey].sort((a, b) => {
+          const episodeA = parseInt(a.episode || "0");
+          const episodeB = parseInt(b.episode || "0");
+          return episodeA - episodeB;
+        });
+      });
+
+      setGroupedMovies(grouped);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -180,7 +210,7 @@ export default function MoviesPage() {
               </div>
             </div>
 
-            <nav style={{ display: "flex", gap: "2rem" }}>
+            <nav style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
               <a href="/" style={{ color: "white", textDecoration: "none" }}>
                 Trang chủ
               </a>
@@ -190,6 +220,44 @@ export default function MoviesPage() {
               >
                 Phim mới
               </a>
+
+              {/* View Mode Toggle */}
+              <div
+                style={{ display: "flex", gap: "0.5rem", marginLeft: "1rem" }}
+              >
+                <button
+                  onClick={() => setViewMode("grid")}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor:
+                      viewMode === "grid" ? "#dc2626" : "#374151",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  📋 Lưới
+                </button>
+                <button
+                  onClick={() => setViewMode("series")}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor:
+                      viewMode === "series" ? "#dc2626" : "#374151",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  📺 Series
+                </button>
+              </div>
             </nav>
           </div>
         </div>
@@ -252,223 +320,477 @@ export default function MoviesPage() {
             </p>
           </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-              gap: "1.5rem",
-            }}
-          >
-            {movies?.data.map((movie) => (
-              <div
-                key={movie.id}
-                style={{
-                  backgroundColor: "#1f2937",
-                  borderRadius: "0.75rem",
-                  overflow: "hidden",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                  transition: "transform 0.3s, box-shadow 0.3s",
-                  cursor: "pointer",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.05)";
-                  e.currentTarget.style.boxShadow =
-                    "0 20px 25px -5px rgba(0, 0, 0, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1)";
-                  e.currentTarget.style.boxShadow =
-                    "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
-                }}
-              >
-                {/* Movie Poster */}
+          {viewMode === "grid" ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+                gap: "1.5rem",
+              }}
+            >
+              {movies?.data.map((movie) => (
                 <div
+                  key={movie.id}
                   style={{
-                    aspectRatio: "3/4",
-                    backgroundImage: `url(${movie.thumbnail})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                    position: "relative",
+                    backgroundColor: "#1f2937",
+                    borderRadius: "0.75rem",
                     overflow: "hidden",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    transition: "transform 0.3s, box-shadow 0.3s",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.style.boxShadow =
+                      "0 20px 25px -5px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
                   }}
                 >
+                  {/* Movie Poster */}
                   <div
                     style={{
-                      position: "absolute",
-                      inset: 0,
-                      background:
-                        "linear-gradient(to top, rgba(0,0,0,0.6), transparent)",
-                      zIndex: 10,
-                    }}
-                  />
-
-                  {/* Play Button */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      zIndex: 20,
-                      opacity: 0,
-                      transition: "opacity 0.3s",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.opacity = "1";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.opacity = "0";
+                      aspectRatio: "3/4",
+                      backgroundImage: `url(${movie.thumbnail})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      position: "relative",
+                      overflow: "hidden",
                     }}
                   >
-                    <button
-                      onClick={() => handlePlay(movie)}
+                    <div
                       style={{
-                        width: "4rem",
-                        height: "4rem",
-                        backgroundColor: "#dc2626",
-                        borderRadius: "50%",
-                        border: "none",
-                        color: "white",
-                        fontSize: "1.5rem",
-                        cursor: "pointer",
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.6), transparent)",
+                        zIndex: 10,
+                      }}
+                    />
+
+                    {/* Play Button */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                        zIndex: 20,
+                        opacity: 0,
+                        transition: "opacity 0.3s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.opacity = "1";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.opacity = "0";
                       }}
                     >
-                      ▶
-                    </button>
-                  </div>
-
-                  {/* Status Badge */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "0.75rem",
-                      right: "0.75rem",
-                      zIndex: 30,
-                    }}
-                  >
-                    <span
-                      style={{
-                        padding: "0.25rem 0.5rem",
-                        borderRadius: "9999px",
-                        fontSize: "0.75rem",
-                        fontWeight: "500",
-                        backgroundColor:
-                          movie.status === "END" ? "#10b981" : "#f59e0b",
-                        color: "white",
-                      }}
-                    >
-                      {movie.status === "END" ? "Hoàn thành" : movie.status}
-                    </span>
-                  </div>
-
-                  {/* Movie Info */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      padding: "1rem",
-                      zIndex: 20,
-                    }}
-                  >
-                    <h3
-                      style={{
-                        color: "white",
-                        fontWeight: "600",
-                        fontSize: "1.125rem",
-                        marginBottom: "0.25rem",
-                        lineHeight: "1.25",
-                      }}
-                    >
-                      {movie.title}
-                    </h3>
-                    {movie.originalTitle && (
-                      <p
+                      <button
+                        onClick={() => handlePlay(movie)}
                         style={{
-                          color: "#d1d5db",
-                          fontSize: "0.875rem",
-                          marginBottom: "0.5rem",
-                          fontStyle: "italic",
+                          width: "4rem",
+                          height: "4rem",
+                          backgroundColor: "#dc2626",
+                          borderRadius: "50%",
+                          border: "none",
+                          color: "white",
+                          fontSize: "1.5rem",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                         }}
                       >
-                        {movie.originalTitle}
-                      </p>
+                        ▶
+                      </button>
+                    </div>
+
+                    {/* Status Badge */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "0.75rem",
+                        right: "0.75rem",
+                        zIndex: 30,
+                      }}
+                    >
+                      <span
+                        style={{
+                          padding: "0.25rem 0.5rem",
+                          borderRadius: "9999px",
+                          fontSize: "0.75rem",
+                          fontWeight: "500",
+                          backgroundColor:
+                            movie.status === "END" ? "#10b981" : "#f59e0b",
+                          color: "white",
+                        }}
+                      >
+                        {movie.status === "END" ? "Hoàn thành" : movie.status}
+                      </span>
+                    </div>
+
+                    {/* Series Badge */}
+                    {movie.series && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "0.75rem",
+                          left: "0.75rem",
+                          zIndex: 30,
+                        }}
+                      >
+                        <span
+                          style={{
+                            padding: "0.25rem 0.5rem",
+                            borderRadius: "9999px",
+                            fontSize: "0.75rem",
+                            fontWeight: "500",
+                            backgroundColor: "#dc2626",
+                            color: "white",
+                          }}
+                        >
+                          📺 {movie.series}
+                        </span>
+                      </div>
                     )}
+
+                    {/* Episode Badge */}
+                    {movie.episode && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: "0.75rem",
+                          left: "0.75rem",
+                          zIndex: 30,
+                        }}
+                      >
+                        <span
+                          style={{
+                            padding: "0.25rem 0.5rem",
+                            borderRadius: "9999px",
+                            fontSize: "0.75rem",
+                            fontWeight: "500",
+                            backgroundColor: "rgba(0,0,0,0.8)",
+                            color: "white",
+                          }}
+                        >
+                          Tập {movie.episode}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Movie Info */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: "1rem",
+                        zIndex: 20,
+                      }}
+                    >
+                      <h3
+                        style={{
+                          color: "white",
+                          fontWeight: "600",
+                          fontSize: "1.125rem",
+                          marginBottom: "0.25rem",
+                          lineHeight: "1.25",
+                        }}
+                      >
+                        {movie.title}
+                      </h3>
+                      {movie.originalTitle && (
+                        <p
+                          style={{
+                            color: "#d1d5db",
+                            fontSize: "0.875rem",
+                            marginBottom: "0.5rem",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          {movie.originalTitle}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Movie Details */}
+                  <div style={{ padding: "1rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.5rem",
+                        fontSize: "0.875rem",
+                        color: "#d1d5db",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        <span style={{ color: "#dc2626" }}>📅</span>
+                        <span>{movie.year}</span>
+                        <span style={{ color: "#6b7280" }}>•</span>
+                        <span>{movie.country}</span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        <span style={{ color: "#dc2626" }}>⏱️</span>
+                        <span>{movie.duration}</span>
+                        <span style={{ color: "#6b7280" }}>•</span>
+                        <span>{movie.episodes} tập</span>
+                      </div>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                        }}
+                      >
+                        <span style={{ color: "#dc2626" }}>🎭</span>
+                        <span style={{ color: "#9ca3af" }}>
+                          {movie.category}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handlePlay(movie)}
+                      className="btn-primary"
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <span>▶</span>
+                      <span>Xem phim</span>
+                    </button>
                   </div>
                 </div>
-
-                {/* Movie Details */}
-                <div style={{ padding: "1rem" }}>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{ display: "flex", flexDirection: "column", gap: "2rem" }}
+            >
+              {Object.entries(groupedMovies).map(
+                ([seriesName, seriesMovies]) => (
                   <div
+                    key={seriesName}
                     style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "0.5rem",
-                      fontSize: "0.875rem",
-                      color: "#d1d5db",
-                      marginBottom: "1rem",
+                      backgroundColor: "#1f2937",
+                      borderRadius: "1rem",
+                      padding: "1.5rem",
+                      border: "1px solid #374151",
                     }}
                   >
+                    {/* Series Header */}
                     <div
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "0.5rem",
+                        gap: "1rem",
+                        marginBottom: "1.5rem",
+                        paddingBottom: "1rem",
+                        borderBottom: "1px solid #374151",
                       }}
                     >
-                      <span style={{ color: "#dc2626" }}>📅</span>
-                      <span>{movie.year}</span>
-                      <span style={{ color: "#6b7280" }}>•</span>
-                      <span>{movie.country}</span>
+                      <div
+                        style={{
+                          width: "3rem",
+                          height: "3rem",
+                          backgroundColor: "#dc2626",
+                          borderRadius: "0.75rem",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        📺
+                      </div>
+                      <div>
+                        <h3
+                          style={{
+                            color: "white",
+                            fontSize: "1.5rem",
+                            fontWeight: "bold",
+                            margin: 0,
+                          }}
+                        >
+                          {seriesName}
+                        </h3>
+                        <p
+                          style={{
+                            color: "#9ca3af",
+                            fontSize: "0.875rem",
+                            margin: 0,
+                          }}
+                        >
+                          {seriesMovies.length} tập
+                        </p>
+                      </div>
                     </div>
+
+                    {/* Episodes Grid */}
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
+                        display: "grid",
+                        gridTemplateColumns:
+                          "repeat(auto-fill, minmax(200px, 1fr))",
+                        gap: "1rem",
                       }}
                     >
-                      <span style={{ color: "#dc2626" }}>⏱️</span>
-                      <span>{movie.duration}</span>
-                      <span style={{ color: "#6b7280" }}>•</span>
-                      <span>{movie.episodes} tập</span>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
-                      <span style={{ color: "#dc2626" }}>🎭</span>
-                      <span style={{ color: "#9ca3af" }}>{movie.category}</span>
+                      {seriesMovies.map((movie) => (
+                        <div
+                          key={movie.id}
+                          style={{
+                            backgroundColor: "#111827",
+                            borderRadius: "0.75rem",
+                            overflow: "hidden",
+                            border: "1px solid #374151",
+                            transition: "all 0.3s ease",
+                            cursor: "pointer",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.02)";
+                            e.currentTarget.style.borderColor = "#dc2626";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = "scale(1)";
+                            e.currentTarget.style.borderColor = "#374151";
+                          }}
+                          onClick={() => handlePlay(movie)}
+                        >
+                          {/* Episode Thumbnail */}
+                          <div
+                            style={{
+                              aspectRatio: "16/9",
+                              backgroundImage: `url(${movie.thumbnail})`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                              position: "relative",
+                            }}
+                          >
+                            {/* Episode Badge */}
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "0.5rem",
+                                left: "0.5rem",
+                                backgroundColor: "#dc2626",
+                                color: "white",
+                                padding: "0.25rem 0.5rem",
+                                borderRadius: "0.25rem",
+                                fontSize: "0.75rem",
+                                fontWeight: "bold",
+                              }}
+                            >
+                              Tập {movie.episode || "N/A"}
+                            </div>
+
+                            {/* Play Overlay */}
+                            <div
+                              style={{
+                                position: "absolute",
+                                inset: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "rgba(0,0,0,0.5)",
+                                opacity: 0,
+                                transition: "opacity 0.3s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.opacity = "1";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.opacity = "0";
+                              }}
+                            >
+                              <div
+                                style={{
+                                  width: "3rem",
+                                  height: "3rem",
+                                  backgroundColor: "#dc2626",
+                                  borderRadius: "50%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  color: "white",
+                                  fontSize: "1.25rem",
+                                }}
+                              >
+                                ▶
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Episode Info */}
+                          <div style={{ padding: "1rem" }}>
+                            <h4
+                              style={{
+                                color: "white",
+                                fontSize: "0.875rem",
+                                fontWeight: "600",
+                                margin: "0 0 0.5rem 0",
+                                lineHeight: "1.25",
+                              }}
+                            >
+                              {movie.title}
+                            </h4>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "0.5rem",
+                                fontSize: "0.75rem",
+                                color: "#9ca3af",
+                              }}
+                            >
+                              <span>⏱️ {movie.duration}</span>
+                              <span>•</span>
+                              <span
+                                style={{
+                                  color:
+                                    movie.status === "END"
+                                      ? "#10b981"
+                                      : "#f59e0b",
+                                }}
+                              >
+                                {movie.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-
-                  <button
-                    onClick={() => handlePlay(movie)}
-                    className="btn-primary"
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "0.5rem",
-                    }}
-                  >
-                    <span>▶</span>
-                    <span>Xem phim</span>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+                )
+              )}
+            </div>
+          )}
 
           {/* Pagination Controls */}
           {totalPages > 1 && (

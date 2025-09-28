@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
+    const series = searchParams.get("series");
 
     // Validate pagination parameters
     if (page < 1 || limit < 1 || limit > 50) {
@@ -78,6 +79,30 @@ export async function GET(request: NextRequest) {
             "https://images.unsplash.com/photo-1489599804341-0a4b0b0b0b0b?w=400&h=600&fit=crop",
         },
       ];
+    }
+
+    // Filter by series if specified
+    if (series) {
+      allData = allData.filter((movie: any) => movie.series === series);
+    } else {
+      // For main movies list, only show episode 1 of each series
+      const seriesMap = new Map();
+      allData = allData.filter((movie: any) => {
+        if (!movie.series) {
+          // Keep movies without series
+          return true;
+        }
+
+        const seriesKey = movie.series;
+        const episodeNum = parseInt(movie.episode || "0");
+
+        if (!seriesMap.has(seriesKey) || episodeNum === 1) {
+          seriesMap.set(seriesKey, movie);
+          return episodeNum === 1; // Only keep episode 1
+        }
+
+        return false;
+      });
     }
 
     // Tính toán pagination
