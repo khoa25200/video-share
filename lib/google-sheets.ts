@@ -62,7 +62,7 @@ export async function getSheetData(): Promise<Movie[]> {
     }
 
     // Xác định range để lấy dữ liệu
-    const sheetName = process.env.GOOGLE_SHEET_NAME || "Trang tính1";
+    const sheetName = process.env.GOOGLE_SHEET_NAME || "main";
     const range = `${sheetName}!A:P`; // Lấy từ cột A đến P (16 cột) - bao gồm series và episode
 
     // Lấy dữ liệu từ sheet
@@ -125,6 +125,84 @@ export async function getSheetData(): Promise<Movie[]> {
     return sortedData;
   } catch (error) {
     console.error("Error fetching sheet data:", error);
+    throw error;
+  }
+}
+
+// Lấy dữ liệu từ sheet highlight
+export async function getHighlightData(): Promise<Movie[]> {
+  try {
+    const sheets = getGoogleSheetsClient();
+    const spreadsheetId =
+      process.env.GOOGLE_SHEET_ID ||
+      "1pG-9mMCMq2sVi8-ez15zjcmCwqI4LCyecX-cC5uQb7U";
+
+    if (!spreadsheetId) {
+      throw new Error("GOOGLE_SHEET_ID is not defined");
+    }
+
+    // Lấy dữ liệu từ sheet highlight
+    const range = "hight_light!A:P";
+
+    const requestOptions: any = {
+      spreadsheetId,
+      range,
+    };
+
+    // Thêm API key nếu có
+    const apiKey =
+      process.env.GOOGLE_API_KEY || "AIzaSyBUH2ZEZrcknbnPMug_OmMAZaNPeFt4_pk";
+    if (apiKey) {
+      requestOptions.key = apiKey;
+    }
+
+    const response = await sheets.spreadsheets.values.get(requestOptions);
+
+    const rows = response.data.values;
+
+    if (!rows || rows.length < 2) {
+      return [];
+    }
+
+    // Lấy header từ hàng đầu tiên
+    const headers = rows[0];
+
+    // Map dữ liệu từ hàng thứ 2 trở đi
+    const data = rows.slice(1).map((row) => {
+      const movie: any = {};
+      headers.forEach((header, index) => {
+        // Map header thành key tương ứng với cấu trúc dữ liệu
+        const keyMap: { [key: string]: string } = {
+          id: "id",
+          title: "title",
+          originalTitle: "originalTitle",
+          country: "country",
+          category: "category",
+          year: "year",
+          episodes: "episodes",
+          duration: "duration",
+          status: "status",
+          actors: "actors",
+          description: "description",
+          iframe: "iframe",
+          thumbnail: "thumbnail",
+          videoUrl: "videoUrl",
+          series: "series",
+          episode: "episode",
+        };
+
+        const key = keyMap[header] || header.toLowerCase().replace(/\s+/g, "");
+        movie[key] = row[index] || "";
+      });
+      return movie as Movie;
+    });
+
+    // Sắp xếp ngược lại (mới nhất trước)
+    const sortedData = data.reverse();
+
+    return sortedData;
+  } catch (error) {
+    console.error("Error fetching highlight data:", error);
     throw error;
   }
 }

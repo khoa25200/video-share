@@ -40,6 +40,10 @@ export default function MoviesPage() {
   const [groupedMovies, setGroupedMovies] = useState<{
     [key: string]: Movie[];
   }>({});
+  const [highlights, setHighlights] = useState<Movie[]>([]);
+  const [highlightsLoading, setHighlightsLoading] = useState(true);
+  const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const fetchMovies = async (page: number = 1) => {
     try {
@@ -85,9 +89,38 @@ export default function MoviesPage() {
     }
   };
 
+  const fetchHighlights = async () => {
+    try {
+      setHighlightsLoading(true);
+      const response = await fetch("/api/highlights");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch highlights");
+      }
+
+      const data = await response.json();
+      setHighlights(data.data);
+    } catch (err) {
+      console.error("Failed to fetch highlights:", err);
+    } finally {
+      setHighlightsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchMovies(1);
+    fetchHighlights();
   }, []);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (highlights.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentHighlightIndex((prev) => (prev + 1) % highlights.length);
+      }, 5000); // Change slide every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [highlights.length]);
 
   const handlePlay = (movie: Movie) => {
     // Chuyển hướng đến trang chi tiết phim
@@ -210,7 +243,15 @@ export default function MoviesPage() {
               </div>
             </div>
 
-            <nav style={{ display: "flex", gap: "2rem", alignItems: "center" }}>
+            {/* Desktop Navigation */}
+            <nav
+              style={{
+                display: "flex",
+                gap: "2rem",
+                alignItems: "center",
+              }}
+              className="hidden md:flex"
+            >
               <a href="/" style={{ color: "white", textDecoration: "none" }}>
                 Trang chủ
               </a>
@@ -311,7 +352,186 @@ export default function MoviesPage() {
                 </button>
               </div>
             </nav>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              style={{
+                display: "none",
+                backgroundColor: "transparent",
+                border: "none",
+                color: "white",
+                fontSize: "1.5rem",
+                cursor: "pointer",
+                padding: "0.5rem",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              className="md:hidden"
+            >
+              {isMobileMenuOpen ? "✕" : "☰"}
+            </button>
           </div>
+
+          {/* Mobile Navigation */}
+          {isMobileMenuOpen && (
+            <div
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 0,
+                right: 0,
+                backgroundColor: "#111827",
+                borderTop: "1px solid #374151",
+                padding: "1rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "1rem",
+                zIndex: 40,
+              }}
+              className="md:hidden"
+            >
+              <a
+                href="/"
+                style={{
+                  color: "white",
+                  textDecoration: "none",
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid #374151",
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Trang chủ
+              </a>
+
+              <div
+                style={{
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid #374151",
+                }}
+              >
+                <a
+                  href="#"
+                  style={{
+                    color: "white",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  Thể loại
+                  <span style={{ fontSize: "0.75rem" }}>▼</span>
+                </a>
+              </div>
+
+              <div
+                style={{
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid #374151",
+                }}
+              >
+                <a
+                  href="#"
+                  style={{
+                    color: "white",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  Quốc gia
+                  <span style={{ fontSize: "0.75rem" }}>▼</span>
+                </a>
+              </div>
+
+              <div
+                style={{
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid #374151",
+                }}
+              >
+                <a
+                  href="#"
+                  style={{
+                    color: "white",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  Phim theo năm
+                  <span style={{ fontSize: "0.75rem" }}>▼</span>
+                </a>
+              </div>
+
+              <a
+                href="/movies"
+                style={{
+                  color: "white",
+                  textDecoration: "none",
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid #374151",
+                }}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Phim Reels
+              </a>
+
+              {/* Mobile View Mode Toggle */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid #374151",
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setViewMode("grid");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor:
+                      viewMode === "grid" ? "#dc2626" : "#374151",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    transition: "all 0.3s ease",
+                    flex: 1,
+                  }}
+                >
+                  📋 Lưới
+                </button>
+                <button
+                  onClick={() => {
+                    setViewMode("series");
+                    setIsMobileMenuOpen(false);
+                  }}
+                  style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor:
+                      viewMode === "series" ? "#dc2626" : "#374151",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    transition: "all 0.3s ease",
+                    flex: 1,
+                  }}
+                >
+                  📺 Series
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -350,6 +570,320 @@ export default function MoviesPage() {
           </p>
         </div>
       </section>
+
+      {/* Highlights Section */}
+      {!highlightsLoading && highlights.length > 0 && (
+        <section style={{ padding: "2rem 0", backgroundColor: "#0f172a" }}>
+          <div
+            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          >
+            <div style={{ marginBottom: "2rem" }}>
+              <h2
+                style={{
+                  fontSize: "2rem",
+                  fontWeight: "bold",
+                  color: "white",
+                  marginBottom: "0.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                ⭐ Phim Nổi Bật
+              </h2>
+              <p style={{ color: "#9ca3af", fontSize: "1rem" }}>
+                Những bộ phim được yêu thích nhất
+              </p>
+            </div>
+
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+                height: "400px",
+                overflow: "hidden",
+                borderRadius: "1rem",
+                backgroundColor: "#1e293b",
+              }}
+            >
+              {/* Carousel Container */}
+              <div
+                style={{
+                  display: "flex",
+                  width: `${highlights.length * 100}%`,
+                  height: "100%",
+                  transform: `translateX(-${
+                    currentHighlightIndex * (100 / highlights.length)
+                  }%)`,
+                  transition: "transform 0.5s ease-in-out",
+                }}
+              >
+                {highlights.map((movie, index) => (
+                  <div
+                    key={movie.id}
+                    style={{
+                      width: `${100 / highlights.length}%`,
+                      height: "100%",
+                      position: "relative",
+                      backgroundImage: `url(${movie.thumbnail})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handlePlay(movie)}
+                  >
+                    {/* Overlay */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(to right, rgba(0,0,0,0.7), rgba(0,0,0,0.3))",
+                        zIndex: 10,
+                      }}
+                    />
+
+                    {/* Content */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: "2rem",
+                        zIndex: 20,
+                        color: "white",
+                      }}
+                    >
+                      {/* Highlight Badge */}
+                      <div style={{ marginBottom: "1rem" }}>
+                        <span
+                          style={{
+                            padding: "0.5rem 1rem",
+                            borderRadius: "9999px",
+                            fontSize: "0.875rem",
+                            fontWeight: "bold",
+                            backgroundColor: "#f59e0b",
+                            color: "white",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.25rem",
+                          }}
+                        >
+                          ⭐ Phim Nổi Bật
+                        </span>
+                      </div>
+
+                      {/* Movie Title */}
+                      <h3
+                        style={{
+                          fontSize: "2rem",
+                          fontWeight: "bold",
+                          marginBottom: "0.5rem",
+                          lineHeight: "1.2",
+                        }}
+                      >
+                        {movie.title}
+                      </h3>
+
+                      {/* Original Title */}
+                      {movie.originalTitle && (
+                        <p
+                          style={{
+                            fontSize: "1.125rem",
+                            color: "#d1d5db",
+                            marginBottom: "1rem",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          {movie.originalTitle}
+                        </p>
+                      )}
+
+                      {/* Movie Info */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "1rem",
+                          marginBottom: "1.5rem",
+                          fontSize: "1rem",
+                          color: "#9ca3af",
+                        }}
+                      >
+                        <span>📅 {movie.year}</span>
+                        <span>•</span>
+                        <span>🌍 {movie.country}</span>
+                        <span>•</span>
+                        <span>🎭 {movie.category}</span>
+                        <span>•</span>
+                        <span>⏱️ {movie.duration}</span>
+                      </div>
+
+                      {/* Description */}
+                      <p
+                        style={{
+                          fontSize: "1rem",
+                          lineHeight: "1.5",
+                          marginBottom: "1.5rem",
+                          color: "#d1d5db",
+                          maxWidth: "600px",
+                        }}
+                      >
+                        {movie.description}
+                      </p>
+
+                      {/* Play Button */}
+                      <button
+                        style={{
+                          padding: "0.75rem 2rem",
+                          backgroundColor: "#dc2626",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "0.5rem",
+                          fontSize: "1.125rem",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#b91c1c";
+                          e.currentTarget.style.transform = "scale(1.05)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#dc2626";
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      >
+                        <span>▶</span>
+                        <span>Xem ngay</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Navigation Arrows */}
+              {highlights.length > 1 && (
+                <>
+                  {/* Previous Button */}
+                  <button
+                    style={{
+                      position: "absolute",
+                      left: "1rem",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: "3rem",
+                      height: "3rem",
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1.5rem",
+                      zIndex: 30,
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.8)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.5)";
+                    }}
+                    onClick={() => {
+                      setCurrentHighlightIndex(
+                        currentHighlightIndex === 0
+                          ? highlights.length - 1
+                          : currentHighlightIndex - 1
+                      );
+                    }}
+                  >
+                    ‹
+                  </button>
+
+                  {/* Next Button */}
+                  <button
+                    style={{
+                      position: "absolute",
+                      right: "1rem",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: "3rem",
+                      height: "3rem",
+                      backgroundColor: "rgba(0,0,0,0.5)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1.5rem",
+                      zIndex: 30,
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.8)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.5)";
+                    }}
+                    onClick={() => {
+                      setCurrentHighlightIndex(
+                        currentHighlightIndex === highlights.length - 1
+                          ? 0
+                          : currentHighlightIndex + 1
+                      );
+                    }}
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+
+              {/* Dots Indicator */}
+              {highlights.length > 1 && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "1rem",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    display: "flex",
+                    gap: "0.5rem",
+                    zIndex: 30,
+                  }}
+                >
+                  {highlights.map((_, index) => (
+                    <button
+                      key={index}
+                      style={{
+                        width: "0.75rem",
+                        height: "0.75rem",
+                        borderRadius: "50%",
+                        border: "none",
+                        backgroundColor:
+                          index === currentHighlightIndex
+                            ? "#dc2626"
+                            : "rgba(255,255,255,0.5)",
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                      }}
+                      onClick={() => setCurrentHighlightIndex(index)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Movies Grid */}
       <section style={{ padding: "2rem 0" }}>
