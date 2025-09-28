@@ -70,7 +70,7 @@ export default function MoviesPage() {
 
       // Sort episodes within each series
       Object.keys(grouped).forEach((seriesKey) => {
-        grouped[seriesKey].sort((a, b) => {
+        grouped[seriesKey].sort((a: Movie, b: Movie) => {
           const episodeA = parseInt(a.episode || "0");
           const episodeB = parseInt(b.episode || "0");
           return episodeA - episodeB;
