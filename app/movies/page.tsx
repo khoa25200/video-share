@@ -214,11 +214,63 @@ export default function MoviesPage() {
               <a href="/" style={{ color: "white", textDecoration: "none" }}>
                 Trang chủ
               </a>
+
+              {/* Thể loại Dropdown */}
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <a
+                  href="#"
+                  style={{
+                    color: "white",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  Thể loại
+                  <span style={{ fontSize: "0.75rem" }}>▼</span>
+                </a>
+              </div>
+
+              {/* Quốc gia Dropdown */}
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <a
+                  href="#"
+                  style={{
+                    color: "white",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  Quốc gia
+                  <span style={{ fontSize: "0.75rem" }}>▼</span>
+                </a>
+              </div>
+
+              {/* Phim theo năm Dropdown */}
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <a
+                  href="#"
+                  style={{
+                    color: "white",
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.25rem",
+                  }}
+                >
+                  Phim theo năm
+                  <span style={{ fontSize: "0.75rem" }}>▼</span>
+                </a>
+              </div>
+
               <a
                 href="/movies"
-                style={{ color: "#dc2626", textDecoration: "none" }}
+                style={{ color: "white", textDecoration: "none" }}
               >
-                Phim mới
+                Phim Reels
               </a>
 
               {/* View Mode Toggle */}
