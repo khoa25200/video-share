@@ -115,7 +115,10 @@ export async function getSheetData(): Promise<Movie[]> {
       return movie as Movie;
     });
 
-    return data;
+    // Sắp xếp ngược lại (mới nhất trước) - giả sử dữ liệu được thêm theo thứ tự thời gian
+    const sortedData = data.reverse();
+
+    return sortedData;
   } catch (error) {
     console.error("Error fetching sheet data:", error);
     throw error;
