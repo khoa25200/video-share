@@ -732,35 +732,6 @@ export default function MoviesPage() {
                       >
                         {movie.description}
                       </p>
-
-                      {/* Play Button */}
-                      <button
-                        style={{
-                          padding: "0.75rem 2rem",
-                          backgroundColor: "#dc2626",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "0.5rem",
-                          fontSize: "1.125rem",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.5rem",
-                          transition: "all 0.3s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#b91c1c";
-                          e.currentTarget.style.transform = "scale(1.05)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#dc2626";
-                          e.currentTarget.style.transform = "scale(1)";
-                        }}
-                      >
-                        <span>▶</span>
-                        <span>Xem ngay</span>
-                      </button>
                     </div>
                   </div>
                 ))}
@@ -935,6 +906,7 @@ export default function MoviesPage() {
                     e.currentTarget.style.boxShadow =
                       "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
                   }}
+                  onClick={() => handlePlay(movie)}
                 >
                   {/* Movie Poster */}
                   <div
@@ -956,46 +928,6 @@ export default function MoviesPage() {
                         zIndex: 10,
                       }}
                     />
-
-                    {/* Play Button */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        zIndex: 20,
-                        opacity: 0,
-                        transition: "opacity 0.3s",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.opacity = "1";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.opacity = "0";
-                      }}
-                    >
-                      <button
-                        onClick={() => handlePlay(movie)}
-                        style={{
-                          width: "4rem",
-                          height: "4rem",
-                          backgroundColor: "#dc2626",
-                          borderRadius: "50%",
-                          border: "none",
-                          color: "white",
-                          fontSize: "1.5rem",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                        }}
-                      >
-                        ▶
-                      </button>
-                    </div>
 
                     {/* Status Badge */}
                     <div
@@ -1157,21 +1089,6 @@ export default function MoviesPage() {
                         </span>
                       </div>
                     </div>
-
-                    <button
-                      onClick={() => handlePlay(movie)}
-                      className="btn-primary"
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "0.5rem",
-                      }}
-                    >
-                      <span>▶</span>
-                      <span>Xem phim</span>
-                    </button>
                   </div>
                 </div>
               ))}
@@ -1294,42 +1211,6 @@ export default function MoviesPage() {
                               }}
                             >
                               Tập {movie.episode || "N/A"}
-                            </div>
-
-                            {/* Play Overlay */}
-                            <div
-                              style={{
-                                position: "absolute",
-                                inset: 0,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                backgroundColor: "rgba(0,0,0,0.5)",
-                                opacity: 0,
-                                transition: "opacity 0.3s ease",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.opacity = "1";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.opacity = "0";
-                              }}
-                            >
-                              <div
-                                style={{
-                                  width: "3rem",
-                                  height: "3rem",
-                                  backgroundColor: "#dc2626",
-                                  borderRadius: "50%",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  color: "white",
-                                  fontSize: "1.25rem",
-                                }}
-                              >
-                                ▶
-                              </div>
                             </div>
                           </div>
 

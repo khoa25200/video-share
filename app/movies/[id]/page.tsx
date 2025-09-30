@@ -16,6 +16,10 @@ export default function MovieDetail({ params }: MovieDetailProps) {
   const [error, setError] = useState<string | null>(null);
   const [movieId, setMovieId] = useState<string | null>(null);
   const [relatedEpisodes, setRelatedEpisodes] = useState<Movie[]>([]);
+  const [episodesPage, setEpisodesPage] = useState(1);
+  const [hasMoreEpisodes, setHasMoreEpisodes] = useState(false);
+  const [loadingEpisodes, setLoadingEpisodes] = useState(false);
+  const [totalEpisodes, setTotalEpisodes] = useState(0);
 
   useEffect(() => {
     const getParams = async () => {
@@ -44,7 +48,9 @@ export default function MovieDetail({ params }: MovieDetailProps) {
         if (data.series) {
           try {
             const episodesResponse = await fetch(
-              `/api/movies?series=${encodeURIComponent(data.series)}`
+              `/api/movies?series=${encodeURIComponent(
+                data.series
+              )}&page=1&limit=10`
             );
             if (episodesResponse.ok) {
               const episodesData = await episodesResponse.json();
@@ -57,6 +63,8 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                 }
               );
               setRelatedEpisodes(sortedEpisodes);
+              setTotalEpisodes(episodesData.total);
+              setHasMoreEpisodes(episodesData.hasNextPage);
             }
           } catch (err) {
             console.error("Failed to fetch related episodes:", err);
@@ -71,6 +79,39 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
     fetchMovie();
   }, [movieId]);
+
+  const loadMoreEpisodes = async () => {
+    if (loadingEpisodes || !hasMoreEpisodes) return;
+
+    setLoadingEpisodes(true);
+    const nextPage = episodesPage + 1;
+
+    try {
+      const episodesResponse = await fetch(
+        `/api/movies?series=${encodeURIComponent(
+          movie?.series || ""
+        )}&page=${nextPage}&limit=10`
+      );
+
+      if (episodesResponse.ok) {
+        const episodesData = await episodesResponse.json();
+        // Sort episodes by episode number
+        const sortedEpisodes = episodesData.data.sort((a: Movie, b: Movie) => {
+          const episodeA = parseInt(a.episode || "0");
+          const episodeB = parseInt(b.episode || "0");
+          return episodeA - episodeB;
+        });
+
+        setRelatedEpisodes((prev) => [...prev, ...sortedEpisodes]);
+        setEpisodesPage(nextPage);
+        setHasMoreEpisodes(episodesData.hasNextPage);
+      }
+    } catch (err) {
+      console.error("Failed to load more episodes:", err);
+    } finally {
+      setLoadingEpisodes(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -418,7 +459,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
         {relatedEpisodes.length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-white mb-6">
-              📺 {movie.series} - Tất cả tập
+              📺 {movie.series} - Tất cả tập ({totalEpisodes} tập)
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {relatedEpisodes.map((episode) => (
@@ -491,6 +532,44 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                 </div>
               ))}
             </div>
+
+            {/* Load More Button */}
+            {hasMoreEpisodes && (
+              <div className="mt-8 text-center">
+                <button
+                  onClick={loadMoreEpisodes}
+                  disabled={loadingEpisodes}
+                  className="bg-primary-600 hover:bg-primary-700 disabled:bg-primary-600/50 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl disabled:cursor-not-allowed"
+                >
+                  {loadingEpisodes ? (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Đang tải...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                      <span>
+                        Xem thêm tập ({totalEpisodes - relatedEpisodes.length}{" "}
+                        tập còn lại)
+                      </span>
+                    </div>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </main>
