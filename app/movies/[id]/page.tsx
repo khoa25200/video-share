@@ -54,15 +54,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             );
             if (episodesResponse.ok) {
               const episodesData = await episodesResponse.json();
-              // Sort episodes by episode number
-              const sortedEpisodes = episodesData.data.sort(
-                (a: Movie, b: Movie) => {
-                  const episodeA = parseInt(a.episode || "0");
-                  const episodeB = parseInt(b.episode || "0");
-                  return episodeA - episodeB;
-                }
-              );
-              setRelatedEpisodes(sortedEpisodes);
+              setRelatedEpisodes(episodesData.data);
               setTotalEpisodes(episodesData.total);
               setHasMoreEpisodes(episodesData.hasNextPage);
             }
@@ -102,12 +94,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
         setRelatedEpisodes((prev) => {
           // Combine existing episodes with new episodes
           const combined = [...prev, ...episodesData.data];
-          // Sort the entire combined list by episode number
-          return combined.sort((a: Movie, b: Movie) => {
-            const episodeA = parseInt(a.episode || "0");
-            const episodeB = parseInt(b.episode || "0");
-            return episodeB - episodeA;
-          });
+          return combined;
         });
 
         setEpisodesPage(nextPage);

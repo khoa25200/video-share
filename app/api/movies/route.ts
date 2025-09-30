@@ -8,6 +8,10 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const series = searchParams.get("series");
+    const search = searchParams.get("search");
+    const category = searchParams.get("category");
+    const year = searchParams.get("year");
+    const country = searchParams.get("country");
 
     // Validate pagination parameters
     if (page < 1 || limit < 1 || limit > 50) {
@@ -79,6 +83,27 @@ export async function GET(request: NextRequest) {
             "https://images.unsplash.com/photo-1489599804341-0a4b0b0b0b0b?w=400&h=600&fit=crop",
         },
       ];
+    }
+
+    // Apply filters
+    if (search) {
+      allData = allData.filter(
+        (movie: any) =>
+          movie.title.toLowerCase().includes(search.toLowerCase()) ||
+          movie.originalTitle.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    if (category) {
+      allData = allData.filter((movie: any) => movie.category === category);
+    }
+
+    if (year) {
+      allData = allData.filter((movie: any) => movie.year === year);
+    }
+
+    if (country) {
+      allData = allData.filter((movie: any) => movie.country === country);
     }
 
     // Filter by series if specified

@@ -48,11 +48,56 @@ export default function MoviesPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [topRanking, setTopRanking] = useState<Movie[]>([]);
   const [rankingLoading, setRankingLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
+
+  // Initialize filters from URL params
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const search = urlParams.get("search") || "";
+    const category = urlParams.get("category") || "";
+    const year = urlParams.get("year") || "";
+    const country = urlParams.get("country") || "";
+    const page = parseInt(urlParams.get("page") || "1");
+
+    setSearchQuery(search);
+    setSelectedCategory(category);
+    setSelectedYear(year);
+    setSelectedCountry(country);
+    setCurrentPage(page);
+  }, []);
+
+  // Update URL params when filters change
+  const updateURLParams = (page: number = currentPage) => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set("search", searchQuery);
+    if (selectedCategory) params.set("category", selectedCategory);
+    if (selectedYear) params.set("year", selectedYear);
+    if (selectedCountry) params.set("country", selectedCountry);
+    if (page > 1) params.set("page", page.toString());
+
+    const newURL = `${window.location.pathname}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
+    window.history.pushState({}, "", newURL);
+  };
 
   const fetchMovies = async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/movies?page=${page}&limit=12`);
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: "12",
+      });
+
+      if (searchQuery) params.append("search", searchQuery);
+      if (selectedCategory) params.append("category", selectedCategory);
+      if (selectedYear) params.append("year", selectedYear);
+      if (selectedCountry) params.append("country", selectedCountry);
+
+      const response = await fetch(`/api/movies?${params.toString()}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch movies");
@@ -62,6 +107,9 @@ export default function MoviesPage() {
       setMovies(data);
       setTotalPages(data.totalPages);
       setCurrentPage(page);
+
+      // Update URL params after successful fetch
+      updateURLParams(page);
 
       // Group movies by series
       const grouped = data.data.reduce(
@@ -169,6 +217,40 @@ export default function MoviesPage() {
       sendNotification();
       sessionStorage.setItem("telegram-notified", "true");
     }
+  }, []);
+
+  // Refetch movies when filters change (debounced for search)
+  useEffect(() => {
+    const timeoutId = setTimeout(
+      () => {
+        fetchMovies(1);
+      },
+      searchQuery ? 500 : 0
+    ); // Debounce search by 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, selectedCategory, selectedYear, selectedCountry]);
+
+  // Handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const search = urlParams.get("search") || "";
+      const category = urlParams.get("category") || "";
+      const year = urlParams.get("year") || "";
+      const country = urlParams.get("country") || "";
+      const page = parseInt(urlParams.get("page") || "1");
+
+      setSearchQuery(search);
+      setSelectedCategory(category);
+      setSelectedYear(year);
+      setSelectedCountry(country);
+      setCurrentPage(page);
+      fetchMovies(page);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   // Auto-rotate carousel
@@ -315,57 +397,6 @@ export default function MoviesPage() {
                 Trang chủ
               </a>
 
-              {/* Thể loại Dropdown */}
-              <div style={{ position: "relative", display: "inline-block" }}>
-                <a
-                  href="#"
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  Thể loại
-                  <span style={{ fontSize: "0.75rem" }}>▼</span>
-                </a>
-              </div>
-
-              {/* Quốc gia Dropdown */}
-              <div style={{ position: "relative", display: "inline-block" }}>
-                <a
-                  href="#"
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  Quốc gia
-                  <span style={{ fontSize: "0.75rem" }}>▼</span>
-                </a>
-              </div>
-
-              {/* Phim theo năm Dropdown */}
-              <div style={{ position: "relative", display: "inline-block" }}>
-                <a
-                  href="#"
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  Phim theo năm
-                  <span style={{ fontSize: "0.75rem" }}>▼</span>
-                </a>
-              </div>
-
               <a
                 href="/movies"
                 style={{ color: "white", textDecoration: "none" }}
@@ -463,69 +494,6 @@ export default function MoviesPage() {
                 Trang chủ
               </a>
 
-              <div
-                style={{
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid #374151",
-                }}
-              >
-                <a
-                  href="#"
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  Thể loại
-                  <span style={{ fontSize: "0.75rem" }}>▼</span>
-                </a>
-              </div>
-
-              <div
-                style={{
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid #374151",
-                }}
-              >
-                <a
-                  href="#"
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  Quốc gia
-                  <span style={{ fontSize: "0.75rem" }}>▼</span>
-                </a>
-              </div>
-
-              <div
-                style={{
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid #374151",
-                }}
-              >
-                <a
-                  href="#"
-                  style={{
-                    color: "white",
-                    textDecoration: "none",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem",
-                  }}
-                >
-                  Phim theo năm
-                  <span style={{ fontSize: "0.75rem" }}>▼</span>
-                </a>
-              </div>
-
               <a
                 href="/movies"
                 style={{
@@ -594,193 +562,6 @@ export default function MoviesPage() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section
-        style={{
-          background: "linear-gradient(135deg, #1f2937 0%, #111827 100%)",
-          padding: "4rem 0",
-          textAlign: "center",
-        }}
-      >
-        <div
-          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
-        >
-          <h1
-            style={{
-              fontSize: "3rem",
-              fontWeight: "bold",
-              marginBottom: "1rem",
-              background: "linear-gradient(to right, #f87171, #dc2626)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Phim Mới Nhất
-          </h1>
-          <p
-            style={{
-              fontSize: "1.25rem",
-              color: "#9ca3af",
-              marginBottom: "2rem",
-            }}
-          >
-            Khám phá những bộ phim hay nhất
-          </p>
-        </div>
-      </section>
-
-      {/* Top Ranking Section */}
-      {!rankingLoading && topRanking.length > 0 && (
-        <section style={{ padding: "2rem 0", backgroundColor: "#1e293b" }}>
-          <div
-            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
-          >
-            <h2
-              style={{
-                fontSize: "2rem",
-                fontWeight: "bold",
-                color: "white",
-                marginBottom: "1.5rem",
-                textAlign: "center",
-              }}
-            >
-              🏆 Top 5 Phim Hay Nhất
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "1.5rem",
-                marginBottom: "2rem",
-              }}
-            >
-              {topRanking.map((movie, index) => (
-                <div
-                  key={movie.id}
-                  style={{
-                    position: "relative",
-                    borderRadius: "0.5rem",
-                    overflow: "hidden",
-                    backgroundColor: "#334155",
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                    cursor: "pointer",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-4px)";
-                    e.currentTarget.style.boxShadow =
-                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
-                  }}
-                  onClick={() => (window.location.href = `/movies/${movie.id}`)}
-                >
-                  {/* Ranking Badge */}
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "0.5rem",
-                      left: "0.5rem",
-                      backgroundColor:
-                        index === 0
-                          ? "#ffd700"
-                          : index === 1
-                          ? "#c0c0c0"
-                          : index === 2
-                          ? "#cd7f32"
-                          : "#dc2626",
-                      color: "white",
-                      padding: "0.25rem 0.5rem",
-                      borderRadius: "0.25rem",
-                      fontSize: "0.75rem",
-                      fontWeight: "bold",
-                      zIndex: 30,
-                    }}
-                  >
-                    #{movie.ranking}
-                  </div>
-
-                  {/* Movie Poster */}
-                  <div style={{ position: "relative", aspectRatio: "2/3" }}>
-                    <img
-                      src={movie.thumbnail}
-                      alt={movie.title}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                      onError={(e) => {
-                        e.currentTarget.src = "/placeholder-movie.jpg";
-                      }}
-                    />
-
-                    {/* Gradient Overlay for Title */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: "80px",
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
-                        zIndex: 15,
-                      }}
-                    />
-
-                    {/* Movie Info */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: "1rem",
-                        zIndex: 20,
-                      }}
-                    >
-                      <h3
-                        style={{
-                          fontSize: "0.875rem",
-                          fontWeight: "bold",
-                          color: "white",
-                          marginBottom: "0.25rem",
-                          lineHeight: "1.2",
-                        }}
-                      >
-                        {movie.title}
-                      </h3>
-                      <p
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#d1d5db",
-                          marginBottom: "0.25rem",
-                        }}
-                      >
-                        {movie.year} • {movie.country}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: "0.75rem",
-                          color: "#9ca3af",
-                        }}
-                      >
-                        {movie.category}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Highlights Section */}
       {!highlightsLoading && highlights.length > 0 && (
         <section style={{ padding: "2rem 0", backgroundColor: "#0f172a" }}>
@@ -799,7 +580,7 @@ export default function MoviesPage() {
                   gap: "0.5rem",
                 }}
               >
-                ⭐ Phim Nổi Bật
+                ⭐ PHIM NỔI BẬT
               </h2>
               <p style={{ color: "#9ca3af", fontSize: "1rem" }}>
                 Những bộ phim được yêu thích nhất
@@ -880,7 +661,7 @@ export default function MoviesPage() {
                             gap: "0.25rem",
                           }}
                         >
-                          ⭐ Phim Nổi Bật
+                          ⭐ PHIM NỔI BẬT
                         </span>
                       </div>
 
@@ -1057,6 +838,7 @@ export default function MoviesPage() {
                         transition: "all 0.3s ease",
                       }}
                       onClick={() => setCurrentHighlightIndex(index)}
+                      title={`Chuyển đến slide ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -1065,6 +847,452 @@ export default function MoviesPage() {
           </div>
         </section>
       )}
+
+      {/* Top Ranking Section */}
+      {!rankingLoading && topRanking.length > 0 && (
+        <section style={{ padding: "2rem 0", backgroundColor: "#1e293b" }}>
+          <div
+            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          >
+            <h2
+              style={{
+                fontSize: "2rem",
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "1.5rem",
+                textAlign: "center",
+              }}
+            >
+              🏆 TOP 5 PHIM XEM NHIỀU NHẤT
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "1.5rem",
+                marginBottom: "2rem",
+              }}
+            >
+              {topRanking.map((movie, index) => (
+                <div
+                  key={movie.id}
+                  style={{
+                    position: "relative",
+                    borderRadius: "0.5rem",
+                    overflow: "hidden",
+                    backgroundColor: "#334155",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onClick={() => (window.location.href = `/movies/${movie.id}`)}
+                >
+                  {/* Ranking Badge */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "0.5rem",
+                      left: "0.5rem",
+                      backgroundColor:
+                        index === 0
+                          ? "#ffd700"
+                          : index === 1
+                          ? "#c0c0c0"
+                          : index === 2
+                          ? "#cd7f32"
+                          : "#dc2626",
+                      color: "white",
+                      padding: "0.25rem 0.5rem",
+                      borderRadius: "0.25rem",
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      zIndex: 30,
+                    }}
+                  >
+                    #{movie.ranking}
+                  </div>
+
+                  {/* Movie Poster */}
+                  <div style={{ position: "relative", aspectRatio: "2/3" }}>
+                    <img
+                      src={movie.thumbnail}
+                      alt={movie.title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder-movie.jpg";
+                      }}
+                    />
+
+                    {/* Gradient Overlay for Title */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: "50%",
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
+                        zIndex: 15,
+                      }}
+                    />
+
+                    {/* Movie Info */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: "1rem",
+                        zIndex: 20,
+                      }}
+                    >
+                      <h3
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: "bold",
+                          color: "white",
+                          marginBottom: "0.25rem",
+                          lineHeight: "1.2",
+                        }}
+                      >
+                        {movie.title}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#d1d5db",
+                          marginBottom: "0.25rem",
+                        }}
+                      >
+                        {movie.year} • {movie.country}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#9ca3af",
+                        }}
+                      >
+                        {movie.category}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Search and Filter Controls */}
+      <section style={{ padding: "1rem 0", backgroundColor: "#1f2937" }}>
+        <div
+          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}
+          >
+            {/* Search Bar - Full Width */}
+            <div
+              style={{
+                position: "relative",
+                width: "100%",
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  display: "flex",
+                  alignItems: "center",
+                  backgroundColor: "rgba(55, 65, 81, 0.8)",
+                  backdropFilter: "blur(10px)",
+                  border: "2px solid transparent",
+                  borderRadius: "50px",
+                  padding: "0.75rem",
+                  transition: "all 0.3s ease",
+                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
+                  maxWidth: "600px",
+                  margin: "0 auto",
+                }}
+                className="search-container"
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "1.5rem",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#9ca3af",
+                    fontSize: "1.2rem",
+                    transition: "all 0.3s ease",
+                  }}
+                  className="search-icon"
+                >
+                  🔍
+                </div>
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm phim, diễn viên..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: "0.75rem 1rem 0.75rem 3.5rem",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    outline: "none",
+                    color: "white",
+                    fontSize: "1rem",
+                    fontWeight: "400",
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                    }
+                  }}
+                  onFocus={(e) => {
+                    e.target.parentElement.style.borderColor = "#dc2626";
+                    e.target.parentElement.style.backgroundColor =
+                      "rgba(55, 65, 81, 0.95)";
+                    e.target.parentElement.style.transform = "scale(1.02)";
+                    e.target.parentElement.style.boxShadow =
+                      "0 8px 30px rgba(220, 38, 38, 0.2)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.parentElement.style.borderColor = "transparent";
+                    e.target.parentElement.style.backgroundColor =
+                      "rgba(55, 65, 81, 0.8)";
+                    e.target.parentElement.style.transform = "scale(1)";
+                    e.target.parentElement.style.boxShadow =
+                      "0 4px 20px rgba(0, 0, 0, 0.1)";
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      updateURLParams();
+                    }}
+                    style={{
+                      position: "absolute",
+                      right: "0.75rem",
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      width: "2.5rem",
+                      height: "2.5rem",
+                      backgroundColor: "rgba(239, 68, 68, 0.2)",
+                      color: "#ef4444",
+                      border: "none",
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      fontSize: "1rem",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "all 0.3s ease",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(239, 68, 68, 0.3)";
+                      e.currentTarget.style.transform =
+                        "translateY(-50%) scale(1.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        "rgba(239, 68, 68, 0.2)";
+                      e.currentTarget.style.transform =
+                        "translateY(-50%) scale(1)";
+                    }}
+                    title="Xóa tìm kiếm"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Filter Controls */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "1rem",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {/* Category Filter */}
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{
+                  backgroundColor: "#374151",
+                  color: "white",
+                  border: "1px solid #4b5563",
+                  borderRadius: "25px",
+                  padding: "0.75rem 1.5rem",
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                  minWidth: "140px",
+                  transition: "all 0.3s ease",
+                }}
+                title="Chọn thể loại phim"
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#dc2626";
+                  e.target.style.backgroundColor = "#4b5563";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#4b5563";
+                  e.target.style.backgroundColor = "#374151";
+                }}
+              >
+                <option value="">🎭 Thể loại</option>
+                <option value="Tình Cảm">Tình Cảm</option>
+                <option value="Hành Động">Hành Động</option>
+                <option value="Hài Hước">Hài Hước</option>
+                <option value="Cổ Trang">Cổ Trang</option>
+                <option value="Kinh Dị">Kinh Dị</option>
+                <option value="Khoa Học Viễn Tưởng">Khoa Học Viễn Tưởng</option>
+              </select>
+
+              {/* Country Filter */}
+              <select
+                value={selectedCountry}
+                onChange={(e) => setSelectedCountry(e.target.value)}
+                style={{
+                  backgroundColor: "#374151",
+                  color: "white",
+                  border: "1px solid #4b5563",
+                  borderRadius: "25px",
+                  padding: "0.75rem 1.5rem",
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                  minWidth: "140px",
+                  transition: "all 0.3s ease",
+                }}
+                title="Chọn quốc gia"
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#dc2626";
+                  e.target.style.backgroundColor = "#4b5563";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#4b5563";
+                  e.target.style.backgroundColor = "#374151";
+                }}
+              >
+                <option value="">🌍 Quốc gia</option>
+                <option value="Trung Quốc">Trung Quốc</option>
+                <option value="Hàn Quốc">Hàn Quốc</option>
+                <option value="Nhật Bản">Nhật Bản</option>
+                <option value="Thái Lan">Thái Lan</option>
+                <option value="Việt Nam">Việt Nam</option>
+                <option value="Mỹ">Mỹ</option>
+              </select>
+
+              {/* Year Filter */}
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                style={{
+                  backgroundColor: "#374151",
+                  color: "white",
+                  border: "1px solid #4b5563",
+                  borderRadius: "25px",
+                  padding: "0.75rem 1.5rem",
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                  minWidth: "140px",
+                  transition: "all 0.3s ease",
+                }}
+                title="Chọn năm phát hành"
+                onFocus={(e) => {
+                  e.target.style.borderColor = "#dc2626";
+                  e.target.style.backgroundColor = "#4b5563";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = "#4b5563";
+                  e.target.style.backgroundColor = "#374151";
+                }}
+              >
+                <option value="">📅 Năm</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+              </select>
+
+              {/* Reset Filter Button */}
+              {(searchQuery ||
+                selectedCategory ||
+                selectedYear ||
+                selectedCountry) && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setSelectedCategory("");
+                    setSelectedYear("");
+                    setSelectedCountry("");
+                    // Clear URL params
+                    window.history.pushState({}, "", window.location.pathname);
+                  }}
+                  style={{
+                    backgroundColor: "rgba(239, 68, 68, 0.2)",
+                    color: "#ef4444",
+                    border: "1px solid rgba(239, 68, 68, 0.3)",
+                    borderRadius: "25px",
+                    padding: "0.75rem 1.5rem",
+                    fontSize: "0.9rem",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                    transition: "all 0.3s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(239, 68, 68, 0.3)";
+                    e.currentTarget.style.borderColor =
+                      "rgba(239, 68, 68, 0.5)";
+                    e.currentTarget.style.transform = "scale(1.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor =
+                      "rgba(239, 68, 68, 0.2)";
+                    e.currentTarget.style.borderColor =
+                      "rgba(239, 68, 68, 0.3)";
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                  title="Xóa tất cả bộ lọc"
+                >
+                  🔄 Reset
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Movies Grid */}
       <section style={{ padding: "2rem 0" }}>
@@ -1220,7 +1448,7 @@ export default function MoviesPage() {
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        height: "80px",
+                        height: "50%",
                         background:
                           "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
                         zIndex: 15,
@@ -1445,7 +1673,7 @@ export default function MoviesPage() {
                                 bottom: 0,
                                 left: 0,
                                 right: 0,
-                                height: "60px",
+                                height: "50%",
                                 background:
                                   "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
                                 zIndex: 15,
