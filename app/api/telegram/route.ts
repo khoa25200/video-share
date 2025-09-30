@@ -6,10 +6,11 @@ export async function POST(request: NextRequest) {
     const { userAgent, ip, timestamp, referer } = body;
 
     // Telegram Bot API
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
-    const chatId = process.env.TELEGRAM_CHAT_ID;
+    const botToken = "8281358006:AAEw2b5hngA6li4EcYyWPN_zEB0TVw-c8n8";
+    const chatId = "-2953760855";
 
     if (!botToken || !chatId) {
+      console.error("Missing Telegram configuration - Status: failed");
       throw new Error("Telegram bot token or chat ID not configured");
     }
 
@@ -43,7 +44,12 @@ export async function POST(request: NextRequest) {
     );
 
     if (!telegramResponse.ok) {
-      throw new Error("Failed to send Telegram message");
+      const errorData = await telegramResponse.text();
+      console.error("Telegram API error - Status:", telegramResponse.status);
+      console.error("Telegram API response:", errorData);
+      throw new Error(
+        `Failed to send Telegram message: ${telegramResponse.status}`
+      );
     }
 
     return NextResponse.json({
@@ -51,7 +57,11 @@ export async function POST(request: NextRequest) {
       message: "Telegram notification sent successfully",
     });
   } catch (error) {
-    console.error("Error sending Telegram notification:", error);
+    console.error("Error sending Telegram notification - Status: failed");
+    console.error(
+      "Error details:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
     return NextResponse.json(
       {
         success: false,

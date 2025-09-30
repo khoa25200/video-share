@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       total: topMovies.length,
     });
   } catch (error) {
-    console.error("Error fetching top ranking movies:", error);
+    console.error("Error fetching top ranking movies - Status: failed");
     return NextResponse.json(
       {
         success: false,

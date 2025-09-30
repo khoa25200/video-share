@@ -24,9 +24,9 @@ export async function sendTelegramNotification() {
     }
 
     const result = await response.json();
-    console.log("Telegram notification sent:", result);
+    console.log("Telegram notification sent - Status:", response.status);
   } catch (error) {
-    console.error("Error sending Telegram notification:", error);
+    console.error("Error sending Telegram notification - Status: failed");
   }
 }
 
@@ -37,7 +37,7 @@ export async function getUserIP(): Promise<string> {
     const data = await response.json();
     return data.ip;
   } catch (error) {
-    console.error("Error getting IP:", error);
+    console.error("Error getting IP - Status: failed");
     return "Unknown";
   }
 }

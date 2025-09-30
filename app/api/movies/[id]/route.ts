@@ -28,7 +28,7 @@ export async function GET(
 
     return NextResponse.json(movie);
   } catch (error) {
-    console.error("Error fetching movie:", error);
+    console.error("Error fetching movie - Status: failed");
     return NextResponse.json(
       { error: "Failed to fetch movie" },
       { status: 500 }

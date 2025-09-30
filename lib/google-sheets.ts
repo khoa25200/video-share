@@ -126,7 +126,7 @@ export async function getSheetData(): Promise<Movie[]> {
 
     return sortedData;
   } catch (error) {
-    console.error("Error fetching sheet data:", error);
+    console.error("Error fetching sheet data - Status: failed");
     throw error;
   }
 }
@@ -205,7 +205,7 @@ export async function getHighlightData(): Promise<Movie[]> {
 
     return sortedData;
   } catch (error) {
-    console.error("Error fetching highlight data:", error);
+    console.error("Error fetching highlight data - Status: failed");
     throw error;
   }
 }
@@ -229,7 +229,7 @@ export async function getTopRankingMovies(): Promise<Movie[]> {
 
     return topMovies;
   } catch (error) {
-    console.error("Error fetching top ranking movies:", error);
+    console.error("Error fetching top ranking movies - Status: failed");
     throw error;
   }
 }

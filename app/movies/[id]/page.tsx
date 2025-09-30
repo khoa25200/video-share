@@ -67,7 +67,10 @@ export default function MovieDetail({ params }: MovieDetailProps) {
               setHasMoreEpisodes(episodesData.hasNextPage);
             }
           } catch (err) {
-            console.error("Failed to fetch related episodes:", err);
+            console.error(
+              "Failed to fetch related episodes:",
+              JSON.stringify(err)
+            );
           }
         }
       } catch (err) {
@@ -111,7 +114,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
         setHasMoreEpisodes(episodesData.hasNextPage);
       }
     } catch (err) {
-      console.error("Failed to load more episodes:", err);
+      console.error("Failed to load more episodes - Status: failed");
     } finally {
       setLoadingEpisodes(false);
     }

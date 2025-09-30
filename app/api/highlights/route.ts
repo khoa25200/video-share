@@ -8,9 +8,9 @@ export async function GET(request: NextRequest) {
     let allData;
     try {
       allData = await getHighlightData();
-      console.log({ highlightData: allData });
+      console.log("Highlights data fetched - Status: success");
     } catch (error) {
-      console.log({ error });
+      console.log("Highlights data fetch failed - Status: error");
       console.warn(
         "Google Sheets highlight API failed, using mock data:",
         error
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       total: allData.length,
     });
   } catch (error) {
-    console.error("Error fetching highlights:", error);
+    console.error("Error fetching highlights - Status: failed");
     return NextResponse.json(
       { error: "Failed to fetch highlights" },
       { status: 500 }

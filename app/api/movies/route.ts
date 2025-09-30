@@ -21,9 +21,9 @@ export async function GET(request: NextRequest) {
     let allData;
     try {
       allData = await getSheetData();
-      console.log({ allData });
+      console.log("Movies data fetched - Status: success");
     } catch (error) {
-      console.log({ error });
+      console.log("Movies data fetch failed - Status: error");
       console.warn("Google Sheets API failed, using mock data:", error);
       // Fallback về mock data nếu Google Sheets không hoạt động
       allData = [
@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
       data,
     });
   } catch (error) {
-    console.error("Error fetching movies:", error);
+    console.error("Error fetching movies - Status: failed");
     return NextResponse.json(
       { error: "Failed to fetch movies" },
       { status: 500 }

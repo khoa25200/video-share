@@ -70,7 +70,7 @@ async function testAPI() {
 
     console.log("🎉 API testing completed!");
   } catch (error) {
-    console.error("❌ Test failed:", error.message);
+    console.error("❌ Test failed - Status: failed");
     console.log("\n💡 Make sure the development server is running:");
     console.log("   npm run dev");
   }

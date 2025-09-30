@@ -105,7 +105,7 @@ export default function MoviesPage() {
       const data = await response.json();
       setHighlights(data.data);
     } catch (err) {
-      console.error("Failed to fetch highlights:", err);
+      console.error("Failed to fetch highlights - Status: failed");
     } finally {
       setHighlightsLoading(false);
     }
@@ -123,7 +123,7 @@ export default function MoviesPage() {
       const data = await response.json();
       setTopRanking(data.data);
     } catch (err) {
-      console.error("Error fetching top ranking movies:", err);
+      console.error("Error fetching top ranking movies - Status: failed");
       setTopRanking([]);
     } finally {
       setRankingLoading(false);
@@ -156,7 +156,10 @@ export default function MoviesPage() {
           }),
         });
       } catch (error) {
-        console.error("Error sending Telegram notification:", error);
+        console.error(
+          "Error sending Telegram notification - Status: failed",
+          JSON.stringify(error)
+        );
       }
     };
 
