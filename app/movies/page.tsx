@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { sendTelegramNotification, getUserIP } from "@/lib/telegram";
 
 interface Movie {
   id: string;
@@ -133,6 +134,38 @@ export default function MoviesPage() {
     fetchMovies(1);
     fetchHighlights();
     fetchTopRanking();
+
+    // Gửi thông báo Telegram khi user truy cập
+    const sendNotification = async () => {
+      try {
+        const ip = await getUserIP();
+        const userAgent = navigator.userAgent;
+        const timestamp = Date.now();
+        const referer = document.referrer;
+
+        await fetch("/api/telegram", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userAgent,
+            ip,
+            timestamp,
+            referer,
+          }),
+        });
+      } catch (error) {
+        console.error("Error sending Telegram notification:", error);
+      }
+    };
+
+    // Chỉ gửi thông báo một lần khi trang load
+    const hasNotified = sessionStorage.getItem("telegram-notified");
+    if (!hasNotified) {
+      sendNotification();
+      sessionStorage.setItem("telegram-notified", "true");
+    }
   }, []);
 
   // Auto-rotate carousel
