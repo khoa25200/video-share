@@ -1,0 +1,25 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getTopRankingMovies } from "@/lib/google-sheets";
+
+export async function GET(request: NextRequest) {
+  try {
+    const topMovies = await getTopRankingMovies();
+
+    return NextResponse.json({
+      success: true,
+      data: topMovies,
+      total: topMovies.length,
+    });
+  } catch (error) {
+    console.error("Error fetching top ranking movies:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to fetch top ranking movies",
+        data: [],
+        total: 0,
+      },
+      { status: 500 }
+    );
+  }
+}

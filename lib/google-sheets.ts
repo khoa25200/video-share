@@ -18,6 +18,7 @@ export interface Movie {
   videoUrl?: string; // Optional video URL for MP4/M3U8 files
   series?: string; // Series name for grouping
   episode?: string; // Episode number within series
+  ranking?: string; // Ranking from 1-5 for top movies
 }
 
 // Khởi tạo Google Sheets API client
@@ -63,7 +64,7 @@ export async function getSheetData(): Promise<Movie[]> {
 
     // Xác định range để lấy dữ liệu
     const sheetName = process.env.GOOGLE_SHEET_NAME || "main";
-    const range = `${sheetName}!A:P`; // Lấy từ cột A đến P (16 cột) - bao gồm series và episode
+    const range = `${sheetName}!A:Q`; // Lấy từ cột A đến Q (17 cột) - bao gồm series, episode và ranking
 
     // Lấy dữ liệu từ sheet
     const requestOptions: any = {
@@ -111,6 +112,7 @@ export async function getSheetData(): Promise<Movie[]> {
           videoUrl: "videoUrl",
           series: "series",
           episode: "episode",
+          ranking: "ranking",
         };
 
         const key = keyMap[header] || header.toLowerCase().replace(/\s+/g, "");
@@ -142,7 +144,7 @@ export async function getHighlightData(): Promise<Movie[]> {
     }
 
     // Lấy dữ liệu từ sheet highlight
-    const range = "hight_light!A:P";
+    const range = "hight_light!A:Q";
 
     const requestOptions: any = {
       spreadsheetId,
@@ -189,6 +191,7 @@ export async function getHighlightData(): Promise<Movie[]> {
           videoUrl: "videoUrl",
           series: "series",
           episode: "episode",
+          ranking: "ranking",
         };
 
         const key = keyMap[header] || header.toLowerCase().replace(/\s+/g, "");
@@ -203,6 +206,30 @@ export async function getHighlightData(): Promise<Movie[]> {
     return sortedData;
   } catch (error) {
     console.error("Error fetching highlight data:", error);
+    throw error;
+  }
+}
+
+// Lấy top 5 phim theo ranking
+export async function getTopRankingMovies(): Promise<Movie[]> {
+  try {
+    const allMovies = await getSheetData();
+
+    // Lọc phim có ranking từ 1-5 và sắp xếp theo ranking
+    const topMovies = allMovies
+      .filter((movie) => {
+        const ranking = parseInt(movie.ranking || "0");
+        return ranking >= 1 && ranking <= 5;
+      })
+      .sort((a, b) => {
+        const rankingA = parseInt(a.ranking || "0");
+        const rankingB = parseInt(b.ranking || "0");
+        return rankingA - rankingB;
+      });
+
+    return topMovies;
+  } catch (error) {
+    console.error("Error fetching top ranking movies:", error);
     throw error;
   }
 }

@@ -18,6 +18,7 @@ interface Movie {
   thumbnail: string;
   series?: string;
   episode?: string;
+  ranking?: string;
 }
 
 interface MoviesResponse {
@@ -44,6 +45,8 @@ export default function MoviesPage() {
   const [highlightsLoading, setHighlightsLoading] = useState(true);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [topRanking, setTopRanking] = useState<Movie[]>([]);
+  const [rankingLoading, setRankingLoading] = useState(true);
 
   const fetchMovies = async (page: number = 1) => {
     try {
@@ -107,9 +110,29 @@ export default function MoviesPage() {
     }
   };
 
+  const fetchTopRanking = async () => {
+    try {
+      setRankingLoading(true);
+      const response = await fetch("/api/ranking");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch top ranking movies");
+      }
+
+      const data = await response.json();
+      setTopRanking(data.data);
+    } catch (err) {
+      console.error("Error fetching top ranking movies:", err);
+      setTopRanking([]);
+    } finally {
+      setRankingLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchMovies(1);
     fetchHighlights();
+    fetchTopRanking();
   }, []);
 
   // Auto-rotate carousel
@@ -571,6 +594,157 @@ export default function MoviesPage() {
         </div>
       </section>
 
+      {/* Top Ranking Section */}
+      {!rankingLoading && topRanking.length > 0 && (
+        <section style={{ padding: "2rem 0", backgroundColor: "#1e293b" }}>
+          <div
+            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          >
+            <h2
+              style={{
+                fontSize: "2rem",
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "1.5rem",
+                textAlign: "center",
+              }}
+            >
+              🏆 Top 5 Phim Hay Nhất
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+                gap: "1.5rem",
+                marginBottom: "2rem",
+              }}
+            >
+              {topRanking.map((movie, index) => (
+                <div
+                  key={movie.id}
+                  style={{
+                    position: "relative",
+                    borderRadius: "0.5rem",
+                    overflow: "hidden",
+                    backgroundColor: "#334155",
+                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow =
+                      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onClick={() => (window.location.href = `/movies/${movie.id}`)}
+                >
+                  {/* Ranking Badge */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "0.5rem",
+                      left: "0.5rem",
+                      backgroundColor:
+                        index === 0
+                          ? "#ffd700"
+                          : index === 1
+                          ? "#c0c0c0"
+                          : index === 2
+                          ? "#cd7f32"
+                          : "#dc2626",
+                      color: "white",
+                      padding: "0.25rem 0.5rem",
+                      borderRadius: "0.25rem",
+                      fontSize: "0.75rem",
+                      fontWeight: "bold",
+                      zIndex: 30,
+                    }}
+                  >
+                    #{movie.ranking}
+                  </div>
+
+                  {/* Movie Poster */}
+                  <div style={{ position: "relative", aspectRatio: "2/3" }}>
+                    <img
+                      src={movie.thumbnail}
+                      alt={movie.title}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.src = "/placeholder-movie.jpg";
+                      }}
+                    />
+
+                    {/* Gradient Overlay for Title */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: "80px",
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
+                        zIndex: 15,
+                      }}
+                    />
+
+                    {/* Movie Info */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: "1rem",
+                        zIndex: 20,
+                      }}
+                    >
+                      <h3
+                        style={{
+                          fontSize: "0.875rem",
+                          fontWeight: "bold",
+                          color: "white",
+                          marginBottom: "0.25rem",
+                          lineHeight: "1.2",
+                        }}
+                      >
+                        {movie.title}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#d1d5db",
+                          marginBottom: "0.25rem",
+                        }}
+                      >
+                        {movie.year} • {movie.country}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          color: "#9ca3af",
+                        }}
+                      >
+                        {movie.category}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Highlights Section */}
       {!highlightsLoading && highlights.length > 0 && (
         <section style={{ padding: "2rem 0", backgroundColor: "#0f172a" }}>
@@ -1003,6 +1177,20 @@ export default function MoviesPage() {
                       </div>
                     )}
 
+                    {/* Gradient Overlay for Title */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: "80px",
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
+                        zIndex: 15,
+                      }}
+                    />
+
                     {/* Movie Info */}
                     <div
                       style={{
@@ -1208,10 +1396,25 @@ export default function MoviesPage() {
                                 borderRadius: "0.25rem",
                                 fontSize: "0.75rem",
                                 fontWeight: "bold",
+                                zIndex: 30,
                               }}
                             >
                               Tập {movie.episode || "N/A"}
                             </div>
+
+                            {/* Gradient Overlay for Title */}
+                            <div
+                              style={{
+                                position: "absolute",
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: "60px",
+                                background:
+                                  "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
+                                zIndex: 15,
+                              }}
+                            />
                           </div>
 
                           {/* Episode Info */}
