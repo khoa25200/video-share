@@ -6,8 +6,12 @@ export async function POST(request: NextRequest) {
     const { userAgent, ip, timestamp, referer } = body;
 
     // Telegram Bot API
-    const botToken = "8281358006:AAEw2b5hngA6li4EcYyWPN_zEB0TVw-c8n8";
-    const chatId = process.env.TELEGRAM_CHAT_ID || "-4806442993"; // Chat ID của bạn
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+
+    if (!botToken || !chatId) {
+      throw new Error("Telegram bot token or chat ID not configured");
+    }
 
     // Parse user agent để lấy thông tin device
     const deviceInfo = parseUserAgent(userAgent);
