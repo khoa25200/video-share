@@ -369,22 +369,16 @@ export default function MoviesPage() {
             <div
               style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
             >
-              <div
+              <img
+                src="/assets/logo.jpg"
+                alt="GL VietSub Logo"
                 style={{
                   width: "2.5rem",
                   height: "2.5rem",
-                  background: "linear-gradient(to right, #dc2626, #b91c1c)",
                   borderRadius: "0.5rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "white",
-                  fontSize: "1.25rem",
-                  fontWeight: "bold",
+                  objectFit: "cover",
                 }}
-              >
-                GL
-              </div>
+              />
               <div>
                 <h1
                   style={{ fontSize: "1.25rem", fontWeight: "bold", margin: 0 }}

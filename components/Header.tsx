@@ -13,9 +13,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
-              <Play className="w-6 h-6 text-white" />
-            </div>
+            <img
+              src="/assets/logo.jpg"
+              alt="GL VietSub Logo"
+              className="w-10 h-10 rounded-lg object-cover"
+            />
             <div>
               <h1 className="text-xl font-bold gradient-text">GL VietSub</h1>
               <p className="text-xs text-gray-400">Xem phim online HD</p>
