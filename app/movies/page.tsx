@@ -279,36 +279,30 @@ export default function MoviesPage() {
       setCountriesLoading(true);
       setYearsLoading(true);
 
-      const response = await fetch("/api/data");
+      // Fetch tất cả dữ liệu song song
+      const [
+        moviesResponse,
+        highlightsResponse,
+        rankingResponse,
+        typesResponse,
+        countriesResponse,
+        yearsResponse,
+      ] = await Promise.all([
+        fetch("/api/movies?page=1&limit=12"),
+        fetch("/api/highlights"),
+        fetch("/api/ranking"),
+        fetch("/api/types"),
+        fetch("/api/countries"),
+        fetch("/api/years"),
+      ]);
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-
-      const result = await response.json();
-      const data = result.data;
-
-      // Set movies data
-      if (data.movies) {
-        // Simulate pagination for movies
-        const page = 1;
-        const limit = 12;
-        const startIndex = (page - 1) * limit;
-        const endIndex = startIndex + limit;
-        const paginatedMovies = data.movies.slice(startIndex, endIndex);
-
-        setMovies({
-          page,
-          limit,
-          total: data.movies.length,
-          totalPages: Math.ceil(data.movies.length / limit),
-          hasNextPage: page < Math.ceil(data.movies.length / limit),
-          hasPrevPage: page > 1,
-          data: paginatedMovies,
-        });
+      // Xử lý movies data
+      if (moviesResponse.ok) {
+        const moviesData = await moviesResponse.json();
+        setMovies(moviesData);
 
         // Group movies by series
-        const grouped = data.movies.reduce(
+        const grouped = moviesData.data.reduce(
           (acc: { [key: string]: Movie[] }, movie: Movie) => {
             const seriesKey = movie.series || "Đơn lẻ";
             if (!acc[seriesKey]) {
@@ -332,21 +326,32 @@ export default function MoviesPage() {
         setGroupedMovies(grouped);
       }
 
-      // Set highlights data
-      if (data.highlights) {
-        setHighlights(data.highlights);
+      // Xử lý highlights data
+      if (highlightsResponse.ok) {
+        const highlightsData = await highlightsResponse.json();
+        setHighlights(highlightsData.data);
       }
 
-      // Set top ranking data
-      if (data.topRanking) {
-        setTopRanking(data.topRanking);
+      // Xử lý ranking data
+      if (rankingResponse.ok) {
+        const rankingData = await rankingResponse.json();
+        setTopRanking(rankingData.data);
       }
 
-      // Set filter data
-      if (data.filters) {
-        setAvailableTypes(data.filters.types);
-        setAvailableCountries(data.filters.countries);
-        setAvailableYears(data.filters.years);
+      // Xử lý filter data
+      if (typesResponse.ok) {
+        const typesData = await typesResponse.json();
+        setAvailableTypes(typesData.data);
+      }
+
+      if (countriesResponse.ok) {
+        const countriesData = await countriesResponse.json();
+        setAvailableCountries(countriesData.data);
+      }
+
+      if (yearsResponse.ok) {
+        const yearsData = await yearsResponse.json();
+        setAvailableYears(yearsData.data);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
