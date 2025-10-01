@@ -4,7 +4,7 @@
 const BASE_URL = "http://localhost:3000";
 
 async function testAPI() {
-  console.log("🧪 Testing GL VietSub API...\n");
+  console.log("🧪 Testing GLVIETSUB API...\n");
 
   try {
     // Test 1: GET /api/movies với pagination

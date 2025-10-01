@@ -463,7 +463,7 @@ export default function MoviesPage() {
             >
               <img
                 src="/assets/logo.jpg"
-                alt="GL VietSub Logo"
+                alt="GLVIETSUB Logo"
                 style={{
                   width: "2.5rem",
                   height: "2.5rem",
@@ -475,7 +475,7 @@ export default function MoviesPage() {
                 <h1
                   style={{ fontSize: "1.25rem", fontWeight: "bold", margin: 0 }}
                 >
-                  GL VietSub
+                  GLVIETSUB
                 </h1>
                 <p style={{ fontSize: "0.75rem", color: "#9ca3af", margin: 0 }}>
                   Xem phim online HD

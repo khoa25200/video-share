@@ -15,11 +15,11 @@ export default function Header() {
           <div className="flex items-center space-x-2">
             <img
               src="/assets/logo.jpg"
-              alt="GL VietSub Logo"
+              alt="GLVIETSUB Logo"
               className="w-10 h-10 rounded-lg object-cover"
             />
             <div>
-              <h1 className="text-xl font-bold gradient-text">GL VietSub</h1>
+              <h1 className="text-xl font-bold gradient-text">GLVIETSUB</h1>
               <p className="text-xs text-gray-400">Xem phim online HD</p>
             </div>
           </div>
