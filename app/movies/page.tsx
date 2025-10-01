@@ -174,6 +174,7 @@ export default function MoviesPage() {
     }
   };
 
+  // Các function fetch riêng lẻ vẫn được giữ lại để tương thích ngược
   const fetchHighlights = async () => {
     try {
       setHighlightsLoading(true);
@@ -268,13 +269,100 @@ export default function MoviesPage() {
     }
   };
 
+  // Fetch tất cả dữ liệu cần thiết trong một lần gọi
+  const fetchAllData = async () => {
+    try {
+      setLoading(true);
+      setHighlightsLoading(true);
+      setRankingLoading(true);
+      setTypesLoading(true);
+      setCountriesLoading(true);
+      setYearsLoading(true);
+
+      const response = await fetch("/api/data");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const result = await response.json();
+      const data = result.data;
+
+      // Set movies data
+      if (data.movies) {
+        // Simulate pagination for movies
+        const page = 1;
+        const limit = 12;
+        const startIndex = (page - 1) * limit;
+        const endIndex = startIndex + limit;
+        const paginatedMovies = data.movies.slice(startIndex, endIndex);
+
+        setMovies({
+          page,
+          limit,
+          total: data.movies.length,
+          totalPages: Math.ceil(data.movies.length / limit),
+          hasNextPage: page < Math.ceil(data.movies.length / limit),
+          hasPrevPage: page > 1,
+          data: paginatedMovies,
+        });
+
+        // Group movies by series
+        const grouped = data.movies.reduce(
+          (acc: { [key: string]: Movie[] }, movie: Movie) => {
+            const seriesKey = movie.series || "Đơn lẻ";
+            if (!acc[seriesKey]) {
+              acc[seriesKey] = [];
+            }
+            acc[seriesKey].push(movie);
+            return acc;
+          },
+          {}
+        );
+
+        // Sort episodes within each series
+        Object.keys(grouped).forEach((seriesKey) => {
+          grouped[seriesKey].sort((a: Movie, b: Movie) => {
+            const episodeA = parseInt(a.episode || "0");
+            const episodeB = parseInt(b.episode || "0");
+            return episodeA - episodeB;
+          });
+        });
+
+        setGroupedMovies(grouped);
+      }
+
+      // Set highlights data
+      if (data.highlights) {
+        setHighlights(data.highlights);
+      }
+
+      // Set top ranking data
+      if (data.topRanking) {
+        setTopRanking(data.topRanking);
+      }
+
+      // Set filter data
+      if (data.filters) {
+        setAvailableTypes(data.filters.types);
+        setAvailableCountries(data.filters.countries);
+        setAvailableYears(data.filters.years);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Error fetching all data:", err);
+    } finally {
+      setLoading(false);
+      setHighlightsLoading(false);
+      setRankingLoading(false);
+      setTypesLoading(false);
+      setCountriesLoading(false);
+      setYearsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchMovies(1);
-    fetchHighlights();
-    fetchTopRanking();
-    fetchAvailableTypes();
-    fetchAvailableCountries();
-    fetchAvailableYears();
+    fetchAllData();
 
     // Gửi thông báo Telegram khi user truy cập
     const sendNotification = async () => {
@@ -450,7 +538,7 @@ export default function MoviesPage() {
         }}
       >
         <div
-          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1rem" }}
         >
           <div
             style={{
@@ -666,7 +754,7 @@ export default function MoviesPage() {
       {!highlightsLoading && highlights.length > 0 && (
         <section style={{ padding: "2rem 0", backgroundColor: "#0f172a" }}>
           <div
-            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+            style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1rem" }}
           >
             <div style={{ marginBottom: "2rem" }}>
               <h2
@@ -1109,7 +1197,7 @@ export default function MoviesPage() {
       {!rankingLoading && topRanking.length > 0 && (
         <section style={{ padding: "2rem 0", backgroundColor: "#1e293b" }}>
           <div
-            style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+            style={{ maxWidth: "1380px", margin: "0 auto", padding: "0 .8rem" }}
           >
             <h2
               style={{
@@ -1265,7 +1353,7 @@ export default function MoviesPage() {
         className="py-4 sm:py-6 bg-gray-800"
       >
         <div
-          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1rem" }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           <div
@@ -1666,7 +1754,7 @@ export default function MoviesPage() {
       {/* Movies Grid */}
       <section style={{ padding: "2rem 0" }} className="py-4 sm:py-8">
         <div
-          style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1rem" }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           {/* Pagination Info */}
