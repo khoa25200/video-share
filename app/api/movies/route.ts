@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSheetData } from "@/lib/google-sheets";
 
+// Function to remove Vietnamese diacritics
+function removeVietnameseDiacritics(str: string): string {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
+    .toLowerCase();
+}
+
 // GET /api/movies - Lấy danh sách movies với pagination
 export async function GET(request: NextRequest) {
   try {
@@ -87,15 +97,25 @@ export async function GET(request: NextRequest) {
 
     // Apply filters
     if (search) {
+      const searchTerm = removeVietnameseDiacritics(search);
       allData = allData.filter(
         (movie: any) =>
-          movie.title.toLowerCase().includes(search.toLowerCase()) ||
-          movie.originalTitle.toLowerCase().includes(search.toLowerCase())
+          removeVietnameseDiacritics(movie.title).includes(searchTerm) ||
+          removeVietnameseDiacritics(movie.originalTitle || "").includes(
+            searchTerm
+          ) ||
+          removeVietnameseDiacritics(movie.actors || "").includes(searchTerm) ||
+          removeVietnameseDiacritics(movie.description || "").includes(
+            searchTerm
+          )
       );
     }
 
     if (category) {
-      allData = allData.filter((movie: any) => movie.category === category);
+      const categoryTerm = removeVietnameseDiacritics(category);
+      allData = allData.filter((movie: any) =>
+        removeVietnameseDiacritics(movie.category || "").includes(categoryTerm)
+      );
     }
 
     if (year) {
@@ -103,7 +123,10 @@ export async function GET(request: NextRequest) {
     }
 
     if (country) {
-      allData = allData.filter((movie: any) => movie.country === country);
+      const countryTerm = removeVietnameseDiacritics(country);
+      allData = allData.filter((movie: any) =>
+        removeVietnameseDiacritics(movie.country || "").includes(countryTerm)
+      );
     }
 
     // Filter by series if specified

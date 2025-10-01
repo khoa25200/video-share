@@ -146,6 +146,20 @@ export default function MoviesPage() {
       });
 
       setGroupedMovies(grouped);
+
+      // Scroll to filter section after pagination (only if there are URL params)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.toString()) {
+        setTimeout(() => {
+          const filterSection = document.getElementById("filter-section");
+          if (filterSection) {
+            filterSection.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }, 100);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
@@ -242,6 +256,17 @@ export default function MoviesPage() {
     setActiveCategory(selectedCategory);
     setActiveYear(selectedYear);
     setActiveCountry(selectedCountry);
+
+    // Scroll to filter section after applying filters (only if there are URL params)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.toString()) {
+      setTimeout(() => {
+        const filterSection = document.getElementById("filter-section");
+        if (filterSection) {
+          filterSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
   };
 
   // Handle browser back/forward navigation
@@ -347,6 +372,7 @@ export default function MoviesPage() {
     >
       {/* Header */}
       <header
+        id="header-section"
         style={{
           backgroundColor: "#1f2937",
           padding: "1rem 0",
@@ -1007,7 +1033,10 @@ export default function MoviesPage() {
       )}
 
       {/* Search and Filter Controls */}
-      <section style={{ padding: "1rem 0", backgroundColor: "#1f2937" }}>
+      <section
+        id="filter-section"
+        style={{ padding: "1rem 0", backgroundColor: "#1f2937" }}
+      >
         <div
           style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
         >
@@ -1161,6 +1190,20 @@ export default function MoviesPage() {
                 onChange={(e) => {
                   setSelectedCategory(e.target.value);
                   setActiveCategory(e.target.value);
+                  // Scroll to filter section after filter change (only if there are URL params)
+                  const urlParams = new URLSearchParams(window.location.search);
+                  if (urlParams.toString()) {
+                    setTimeout(() => {
+                      const filterSection =
+                        document.getElementById("filter-section");
+                      if (filterSection) {
+                        filterSection.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                    }, 100);
+                  }
                 }}
                 style={{
                   backgroundColor: "#374151",
@@ -1198,6 +1241,20 @@ export default function MoviesPage() {
                 onChange={(e) => {
                   setSelectedCountry(e.target.value);
                   setActiveCountry(e.target.value);
+                  // Scroll to filter section after filter change (only if there are URL params)
+                  const urlParams = new URLSearchParams(window.location.search);
+                  if (urlParams.toString()) {
+                    setTimeout(() => {
+                      const filterSection =
+                        document.getElementById("filter-section");
+                      if (filterSection) {
+                        filterSection.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                    }, 100);
+                  }
                 }}
                 style={{
                   backgroundColor: "#374151",
@@ -1235,6 +1292,20 @@ export default function MoviesPage() {
                 onChange={(e) => {
                   setSelectedYear(e.target.value);
                   setActiveYear(e.target.value);
+                  // Scroll to filter section after filter change (only if there are URL params)
+                  const urlParams = new URLSearchParams(window.location.search);
+                  if (urlParams.toString()) {
+                    setTimeout(() => {
+                      const filterSection =
+                        document.getElementById("filter-section");
+                      if (filterSection) {
+                        filterSection.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }
+                    }, 100);
+                  }
                 }}
                 style={{
                   backgroundColor: "#374151",
