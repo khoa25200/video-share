@@ -52,6 +52,12 @@ export default function MoviesPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
+  const [typesLoading, setTypesLoading] = useState(true);
+  const [availableCountries, setAvailableCountries] = useState<string[]>([]);
+  const [countriesLoading, setCountriesLoading] = useState(true);
+  const [availableYears, setAvailableYears] = useState<string[]>([]);
+  const [yearsLoading, setYearsLoading] = useState(true);
 
   // Separate state for actual search/filter values
   const [activeSearchQuery, setActiveSearchQuery] = useState("");
@@ -204,10 +210,70 @@ export default function MoviesPage() {
     }
   };
 
+  const fetchAvailableTypes = async () => {
+    try {
+      setTypesLoading(true);
+      const response = await fetch("/api/types");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch available types");
+      }
+
+      const data = await response.json();
+      setAvailableTypes(data.data);
+    } catch (err) {
+      console.error("Error fetching available types - Status: failed");
+      setAvailableTypes([]);
+    } finally {
+      setTypesLoading(false);
+    }
+  };
+
+  const fetchAvailableCountries = async () => {
+    try {
+      setCountriesLoading(true);
+      const response = await fetch("/api/countries");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch available countries");
+      }
+
+      const data = await response.json();
+      setAvailableCountries(data.data);
+    } catch (err) {
+      console.error("Error fetching available countries - Status: failed");
+      setAvailableCountries([]);
+    } finally {
+      setCountriesLoading(false);
+    }
+  };
+
+  const fetchAvailableYears = async () => {
+    try {
+      setYearsLoading(true);
+      const response = await fetch("/api/years");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch available years");
+      }
+
+      const data = await response.json();
+      setAvailableYears(data.data);
+    } catch (err) {
+      console.error("Error fetching available years - Status: failed");
+      setAvailableYears([]);
+    } finally {
+      setYearsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchMovies(1);
     fetchHighlights();
     fetchTopRanking();
+    fetchAvailableTypes();
+    fetchAvailableCountries();
+    fetchAvailableYears();
 
     // Gửi thông báo Telegram khi user truy cập
     const sendNotification = async () => {
@@ -1225,14 +1291,14 @@ export default function MoviesPage() {
                   e.target.style.borderColor = "#4b5563";
                   e.target.style.backgroundColor = "#374151";
                 }}
+                disabled={typesLoading}
               >
                 <option value="">🎭 Thể loại</option>
-                <option value="Tình Cảm">Tình Cảm</option>
-                <option value="Hành Động">Hành Động</option>
-                <option value="Hài Hước">Hài Hước</option>
-                <option value="Cổ Trang">Cổ Trang</option>
-                <option value="Kinh Dị">Kinh Dị</option>
-                <option value="Khoa Học Viễn Tưởng">Khoa Học Viễn Tưởng</option>
+                {availableTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
               </select>
 
               {/* Country Filter */}
@@ -1276,14 +1342,14 @@ export default function MoviesPage() {
                   e.target.style.borderColor = "#4b5563";
                   e.target.style.backgroundColor = "#374151";
                 }}
+                disabled={countriesLoading}
               >
                 <option value="">🌍 Quốc gia</option>
-                <option value="Trung Quốc">Trung Quốc</option>
-                <option value="Hàn Quốc">Hàn Quốc</option>
-                <option value="Nhật Bản">Nhật Bản</option>
-                <option value="Thái Lan">Thái Lan</option>
-                <option value="Việt Nam">Việt Nam</option>
-                <option value="Mỹ">Mỹ</option>
+                {availableCountries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
               </select>
 
               {/* Year Filter */}
@@ -1327,14 +1393,14 @@ export default function MoviesPage() {
                   e.target.style.borderColor = "#4b5563";
                   e.target.style.backgroundColor = "#374151";
                 }}
+                disabled={yearsLoading}
               >
                 <option value="">📅 Năm</option>
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
               </select>
 
               {/* Search Button */}

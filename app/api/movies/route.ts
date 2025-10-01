@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSheetData } from "@/lib/google-sheets";
+import { getSheetData, getUniqueTypes } from "@/lib/google-sheets";
 
 // Function to remove Vietnamese diacritics
 function removeVietnameseDiacritics(str: string): string {
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
     if (category) {
       const categoryTerm = removeVietnameseDiacritics(category);
       allData = allData.filter((movie: any) =>
-        removeVietnameseDiacritics(movie.category || "").includes(categoryTerm)
+        removeVietnameseDiacritics(movie.type || "").includes(categoryTerm)
       );
     }
 
