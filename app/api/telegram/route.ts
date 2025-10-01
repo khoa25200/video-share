@@ -6,8 +6,8 @@ export async function POST(request: NextRequest) {
     const { userAgent, ip, timestamp, referer } = body;
 
     // Telegram Bot API
-    const botToken = "8281358006:AAEw2b5hngA6li4EcYyWPN_zEB0TVw-c8n8";
-    const chatId = "-2953760855";
+    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
 
     if (!botToken || !chatId) {
       console.error("Missing Telegram configuration - Status: failed");

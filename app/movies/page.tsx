@@ -53,6 +53,12 @@ export default function MoviesPage() {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("");
 
+  // Separate state for actual search/filter values
+  const [activeSearchQuery, setActiveSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("");
+  const [activeYear, setActiveYear] = useState("");
+  const [activeCountry, setActiveCountry] = useState("");
+
   // Initialize filters from URL params
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -66,16 +72,22 @@ export default function MoviesPage() {
     setSelectedCategory(category);
     setSelectedYear(year);
     setSelectedCountry(country);
+
+    // Set active values from URL
+    setActiveSearchQuery(search);
+    setActiveCategory(category);
+    setActiveYear(year);
+    setActiveCountry(country);
     setCurrentPage(page);
   }, []);
 
   // Update URL params when filters change
   const updateURLParams = (page: number = currentPage) => {
     const params = new URLSearchParams();
-    if (searchQuery) params.set("search", searchQuery);
-    if (selectedCategory) params.set("category", selectedCategory);
-    if (selectedYear) params.set("year", selectedYear);
-    if (selectedCountry) params.set("country", selectedCountry);
+    if (activeSearchQuery) params.set("search", activeSearchQuery);
+    if (activeCategory) params.set("category", activeCategory);
+    if (activeYear) params.set("year", activeYear);
+    if (activeCountry) params.set("country", activeCountry);
     if (page > 1) params.set("page", page.toString());
 
     const newURL = `${window.location.pathname}${
@@ -92,10 +104,10 @@ export default function MoviesPage() {
         limit: "12",
       });
 
-      if (searchQuery) params.append("search", searchQuery);
-      if (selectedCategory) params.append("category", selectedCategory);
-      if (selectedYear) params.append("year", selectedYear);
-      if (selectedCountry) params.append("country", selectedCountry);
+      if (activeSearchQuery) params.append("search", activeSearchQuery);
+      if (activeCategory) params.append("category", activeCategory);
+      if (activeYear) params.append("year", activeYear);
+      if (activeCountry) params.append("country", activeCountry);
 
       const response = await fetch(`/api/movies?${params.toString()}`);
 
@@ -219,17 +231,18 @@ export default function MoviesPage() {
     }
   }, []);
 
-  // Refetch movies when filters change (debounced for search)
+  // Refetch movies when active filters change
   useEffect(() => {
-    const timeoutId = setTimeout(
-      () => {
-        fetchMovies(1);
-      },
-      searchQuery ? 500 : 0
-    ); // Debounce search by 500ms
+    fetchMovies(1);
+  }, [activeSearchQuery, activeCategory, activeYear, activeCountry]);
 
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, selectedCategory, selectedYear, selectedCountry]);
+  // Function to apply search and filters
+  const applyFilters = () => {
+    setActiveSearchQuery(searchQuery);
+    setActiveCategory(selectedCategory);
+    setActiveYear(selectedYear);
+    setActiveCountry(selectedCountry);
+  };
 
   // Handle browser back/forward navigation
   useEffect(() => {
@@ -1067,29 +1080,37 @@ export default function MoviesPage() {
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
+                      applyFilters();
                     }
                   }}
                   onFocus={(e) => {
-                    e.target.parentElement.style.borderColor = "#dc2626";
-                    e.target.parentElement.style.backgroundColor =
-                      "rgba(55, 65, 81, 0.95)";
-                    e.target.parentElement.style.transform = "scale(1.02)";
-                    e.target.parentElement.style.boxShadow =
-                      "0 8px 30px rgba(220, 38, 38, 0.2)";
+                    const parentElement = e.target.parentElement;
+                    if (parentElement) {
+                      parentElement.style.borderColor = "#dc2626";
+                      parentElement.style.backgroundColor =
+                        "rgba(55, 65, 81, 0.95)";
+                      parentElement.style.transform = "scale(1.02)";
+                      parentElement.style.boxShadow =
+                        "0 8px 30px rgba(220, 38, 38, 0.2)";
+                    }
                   }}
                   onBlur={(e) => {
-                    e.target.parentElement.style.borderColor = "transparent";
-                    e.target.parentElement.style.backgroundColor =
-                      "rgba(55, 65, 81, 0.8)";
-                    e.target.parentElement.style.transform = "scale(1)";
-                    e.target.parentElement.style.boxShadow =
-                      "0 4px 20px rgba(0, 0, 0, 0.1)";
+                    const parentElement = e.target.parentElement;
+                    if (parentElement) {
+                      parentElement.style.borderColor = "transparent";
+                      parentElement.style.backgroundColor =
+                        "rgba(55, 65, 81, 0.8)";
+                      parentElement.style.transform = "scale(1)";
+                      parentElement.style.boxShadow =
+                        "0 4px 20px rgba(0, 0, 0, 0.1)";
+                    }
                   }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => {
                       setSearchQuery("");
+                      setActiveSearchQuery("");
                       updateURLParams();
                     }}
                     style={{
@@ -1143,7 +1164,10 @@ export default function MoviesPage() {
               {/* Category Filter */}
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  setActiveCategory(e.target.value);
+                }}
                 style={{
                   backgroundColor: "#374151",
                   color: "white",
@@ -1177,7 +1201,10 @@ export default function MoviesPage() {
               {/* Country Filter */}
               <select
                 value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCountry(e.target.value);
+                  setActiveCountry(e.target.value);
+                }}
                 style={{
                   backgroundColor: "#374151",
                   color: "white",
@@ -1211,7 +1238,10 @@ export default function MoviesPage() {
               {/* Year Filter */}
               <select
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
+                onChange={(e) => {
+                  setSelectedYear(e.target.value);
+                  setActiveYear(e.target.value);
+                }}
                 style={{
                   backgroundColor: "#374151",
                   color: "white",
@@ -1242,6 +1272,40 @@ export default function MoviesPage() {
                 <option value="2020">2020</option>
               </select>
 
+              {/* Search Button */}
+              <button
+                onClick={applyFilters}
+                style={{
+                  backgroundColor: "rgba(34, 197, 94, 0.2)",
+                  color: "#22c55e",
+                  border: "1px solid rgba(34, 197, 94, 0.3)",
+                  borderRadius: "25px",
+                  padding: "0.75rem 1.5rem",
+                  fontSize: "0.9rem",
+                  cursor: "pointer",
+                  fontWeight: "500",
+                  transition: "all 0.3s ease",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(34, 197, 94, 0.3)";
+                  e.currentTarget.style.borderColor = "rgba(34, 197, 94, 0.5)";
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor =
+                    "rgba(34, 197, 94, 0.2)";
+                  e.currentTarget.style.borderColor = "rgba(34, 197, 94, 0.3)";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+                title="Tìm kiếm"
+              >
+                🔍 Tìm kiếm
+              </button>
+
               {/* Reset Filter Button */}
               {(searchQuery ||
                 selectedCategory ||
@@ -1253,6 +1317,10 @@ export default function MoviesPage() {
                     setSelectedCategory("");
                     setSelectedYear("");
                     setSelectedCountry("");
+                    setActiveSearchQuery("");
+                    setActiveCategory("");
+                    setActiveYear("");
+                    setActiveCountry("");
                     // Clear URL params
                     window.history.pushState({}, "", window.location.pathname);
                   }}
