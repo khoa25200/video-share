@@ -45,6 +45,7 @@ export default function MoviesPage() {
   const [highlights, setHighlights] = useState<Movie[]>([]);
   const [highlightsLoading, setHighlightsLoading] = useState(true);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
+  const [visibleHighlights, setVisibleHighlights] = useState(3);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [topRanking, setTopRanking] = useState<Movie[]>([]);
   const [rankingLoading, setRankingLoading] = useState(true);
@@ -686,6 +687,148 @@ export default function MoviesPage() {
               </p>
             </div>
 
+            {/* Mobile Grid View */}
+            <div className="block sm:hidden">
+              <div className="grid grid-cols-1 gap-3">
+                {highlights.slice(0, visibleHighlights).map((movie) => (
+                  <div
+                    key={movie.id}
+                    style={{
+                      position: "relative",
+                      aspectRatio: "16/9",
+                      backgroundImage: `url(${movie.thumbnail})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      borderRadius: "0.75rem",
+                      overflow: "hidden",
+                      cursor: "pointer",
+                    }}
+                    className="relative aspect-video bg-cover bg-center rounded-lg overflow-hidden cursor-pointer"
+                    onClick={() => handlePlay(movie)}
+                  >
+                    {/* Overlay */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3))",
+                        zIndex: 10,
+                      }}
+                    />
+
+                    {/* Content */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: "1rem",
+                        zIndex: 20,
+                        color: "white",
+                      }}
+                      className="absolute bottom-0 left-0 right-0 p-4 z-20 text-white"
+                    >
+                      {/* Highlight Badge */}
+                      <div className="mb-2">
+                        <span
+                          style={{
+                            padding: "0.25rem 0.5rem",
+                            borderRadius: "9999px",
+                            fontSize: "0.625rem",
+                            fontWeight: "bold",
+                            backgroundColor: "#f59e0b",
+                            color: "white",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "0.125rem",
+                          }}
+                          className="px-2 py-1 text-xs font-bold bg-yellow-500 text-white rounded-full inline-flex items-center gap-1"
+                        >
+                          ⭐ PHIM NỔI BẬT
+                        </span>
+                      </div>
+
+                      {/* Movie Title */}
+                      <h3
+                        style={{
+                          fontSize: "1rem",
+                          fontWeight: "bold",
+                          marginBottom: "0.5rem",
+                          lineHeight: "1.2",
+                        }}
+                        className="text-base font-bold mb-2 leading-tight line-clamp-2"
+                      >
+                        {movie.title}
+                      </h3>
+
+                      {/* Movie Info */}
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "0.75rem",
+                          fontSize: "0.75rem",
+                          color: "#9ca3af",
+                          marginBottom: "0.5rem",
+                        }}
+                        className="flex items-center gap-2 text-sm text-gray-400 mb-2"
+                      >
+                        <span>📅 {movie.year}</span>
+                        <span>•</span>
+                        <span>🌍 {movie.country}</span>
+                        <span>•</span>
+                        <span>⏱️ {movie.duration}</span>
+                      </div>
+
+                      {/* Description */}
+                      <p
+                        style={{
+                          fontSize: "0.75rem",
+                          lineHeight: "1.4",
+                          color: "#d1d5db",
+                          maxWidth: "100%",
+                        }}
+                        className="text-sm leading-relaxed text-gray-300 line-clamp-2"
+                      >
+                        {movie.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More Button */}
+              {highlights.length > 3 &&
+                visibleHighlights < highlights.length && (
+                  <div className="flex justify-center mt-4">
+                    <button
+                      onClick={() =>
+                        setVisibleHighlights((prev) =>
+                          Math.min(prev + 3, highlights.length)
+                        )
+                      }
+                      style={{
+                        padding: "0.75rem 1.5rem",
+                        backgroundColor: "#dc2626",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "0.5rem",
+                        fontSize: "0.875rem",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                        transition: "all 0.3s ease",
+                      }}
+                      className="px-6 py-3 bg-red-600 text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all duration-300 hover:bg-red-700 hover:scale-105"
+                    >
+                      Xem thêm ({highlights.length - visibleHighlights} phim)
+                    </button>
+                  </div>
+                )}
+            </div>
+
+            {/* Desktop Carousel View */}
             <div
               style={{
                 position: "relative",
@@ -695,6 +838,7 @@ export default function MoviesPage() {
                 borderRadius: "1rem",
                 backgroundColor: "#1e293b",
               }}
+              className="hidden sm:block h-96 md:h-[400px]"
             >
               {/* Carousel Container */}
               <div
@@ -744,9 +888,13 @@ export default function MoviesPage() {
                         zIndex: 20,
                         color: "white",
                       }}
+                      className="p-4 sm:p-8"
                     >
                       {/* Highlight Badge */}
-                      <div style={{ marginBottom: "1rem" }}>
+                      <div
+                        style={{ marginBottom: "1rem" }}
+                        className="mb-2 sm:mb-4"
+                      >
                         <span
                           style={{
                             padding: "0.5rem 1rem",
@@ -759,8 +907,10 @@ export default function MoviesPage() {
                             alignItems: "center",
                             gap: "0.25rem",
                           }}
+                          className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm"
                         >
-                          ⭐ PHIM NỔI BẬT
+                          ⭐{" "}
+                          <span className="hidden sm:inline">PHIM NỔI BẬT</span>
                         </span>
                       </div>
 
@@ -772,6 +922,7 @@ export default function MoviesPage() {
                           marginBottom: "0.5rem",
                           lineHeight: "1.2",
                         }}
+                        className="text-lg sm:text-3xl font-bold mb-1 sm:mb-2 leading-tight"
                       >
                         {movie.title}
                       </h3>
@@ -785,6 +936,7 @@ export default function MoviesPage() {
                             marginBottom: "1rem",
                             fontStyle: "italic",
                           }}
+                          className="text-sm sm:text-lg text-gray-300 mb-2 sm:mb-4 italic"
                         >
                           {movie.originalTitle}
                         </p>
@@ -800,17 +952,18 @@ export default function MoviesPage() {
                           fontSize: "1rem",
                           color: "#9ca3af",
                         }}
+                        className="flex items-center gap-1 sm:gap-4 mb-2 sm:mb-6 text-xs sm:text-base text-gray-400"
                       >
                         <span>📅 {movie.year}</span>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>🌍 {movie.country}</span>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>🎭 {movie.category}</span>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>⏱️ {movie.duration}</span>
                       </div>
 
-                      {/* Description */}
+                      {/* Description - Hidden on mobile */}
                       <p
                         style={{
                           fontSize: "1rem",
@@ -819,6 +972,7 @@ export default function MoviesPage() {
                           color: "#d1d5db",
                           maxWidth: "600px",
                         }}
+                        className="hidden sm:block text-sm sm:text-base leading-relaxed mb-4 sm:mb-6 text-gray-300 max-w-2xl"
                       >
                         {movie.description}
                       </p>
@@ -827,7 +981,7 @@ export default function MoviesPage() {
                 ))}
               </div>
 
-              {/* Navigation Arrows */}
+              {/* Navigation Arrows - Desktop Only */}
               {highlights.length > 1 && (
                 <>
                   {/* Previous Button */}
@@ -851,6 +1005,7 @@ export default function MoviesPage() {
                       zIndex: 30,
                       transition: "all 0.3s ease",
                     }}
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/50 text-white border-none rounded-full cursor-pointer flex items-center justify-center text-2xl z-30 transition-all duration-300 hover:bg-black/80"
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.8)";
                     }}
@@ -889,6 +1044,7 @@ export default function MoviesPage() {
                       zIndex: 30,
                       transition: "all 0.3s ease",
                     }}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-black/50 text-white border-none rounded-full cursor-pointer flex items-center justify-center text-2xl z-30 transition-all duration-300 hover:bg-black/80"
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = "rgba(0,0,0,0.8)";
                     }}
@@ -908,7 +1064,7 @@ export default function MoviesPage() {
                 </>
               )}
 
-              {/* Dots Indicator */}
+              {/* Dots Indicator - Desktop Only */}
               {highlights.length > 1 && (
                 <div
                   style={{
@@ -920,6 +1076,7 @@ export default function MoviesPage() {
                     gap: "0.5rem",
                     zIndex: 30,
                   }}
+                  className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-30"
                 >
                   {highlights.map((_, index) => (
                     <button
@@ -936,6 +1093,7 @@ export default function MoviesPage() {
                         cursor: "pointer",
                         transition: "all 0.3s ease",
                       }}
+                      className="w-3 h-3 rounded-full border-none cursor-pointer transition-all duration-300"
                       onClick={() => setCurrentHighlightIndex(index)}
                       title={`Chuyển đến slide ${index + 1}`}
                     />
@@ -967,10 +1125,12 @@ export default function MoviesPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "1.5rem",
+                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 250px))",
+                gap: "1rem",
                 marginBottom: "2rem",
+                justifyContent: "center",
               }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 justify-center"
             >
               {topRanking.map((movie, index) => (
                 <div
@@ -1102,9 +1262,11 @@ export default function MoviesPage() {
       <section
         id="filter-section"
         style={{ padding: "1rem 0", backgroundColor: "#1f2937" }}
+        className="py-4 sm:py-6 bg-gray-800"
       >
         <div
           style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           <div
             style={{
@@ -1112,6 +1274,7 @@ export default function MoviesPage() {
               flexDirection: "column",
               gap: "1rem",
             }}
+            className="flex flex-col gap-4 sm:gap-6"
           >
             {/* Search Bar - Full Width */}
             <div
@@ -1119,6 +1282,7 @@ export default function MoviesPage() {
                 position: "relative",
                 width: "100%",
               }}
+              className="relative w-full"
             >
               <div
                 style={{
@@ -1135,19 +1299,19 @@ export default function MoviesPage() {
                   maxWidth: "600px",
                   margin: "0 auto",
                 }}
-                className="search-container"
+                className="search-container relative flex items-center bg-gray-700/80 backdrop-blur-sm border-2 border-transparent rounded-full p-2 sm:p-4 transition-all duration-300 shadow-lg max-w-2xl mx-auto"
               >
                 <div
                   style={{
                     position: "absolute",
-                    left: "1.5rem",
+                    left: "0.75rem",
                     top: "50%",
                     transform: "translateY(-50%)",
                     color: "#9ca3af",
-                    fontSize: "1.2rem",
+                    fontSize: "1rem",
                     transition: "all 0.3s ease",
                   }}
-                  className="search-icon"
+                  className="search-icon absolute left-3 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm sm:text-xl transition-all duration-300"
                 >
                   🔍
                 </div>
@@ -1158,12 +1322,12 @@ export default function MoviesPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
                     flex: 1,
-                    padding: "0.75rem 1rem 0.75rem 3.5rem",
+                    padding: "0.5rem 0.75rem 0.5rem 2.5rem",
                     backgroundColor: "transparent",
                     border: "none",
                     outline: "none",
                     color: "white",
-                    fontSize: "1rem",
+                    fontSize: "0.875rem",
                     fontWeight: "400",
                   }}
                   onKeyPress={(e) => {
@@ -1249,6 +1413,7 @@ export default function MoviesPage() {
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              className="flex flex-wrap gap-1 sm:gap-4 justify-center items-center"
             >
               {/* Category Filter */}
               <select
@@ -1282,6 +1447,7 @@ export default function MoviesPage() {
                   minWidth: "140px",
                   transition: "all 0.3s ease",
                 }}
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[100px] sm:min-w-[140px] transition-all duration-300"
                 title="Chọn thể loại phim"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1333,6 +1499,7 @@ export default function MoviesPage() {
                   minWidth: "140px",
                   transition: "all 0.3s ease",
                 }}
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[100px] sm:min-w-[140px] transition-all duration-300"
                 title="Chọn quốc gia"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1384,6 +1551,7 @@ export default function MoviesPage() {
                   minWidth: "140px",
                   transition: "all 0.3s ease",
                 }}
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[100px] sm:min-w-[140px] transition-all duration-300"
                 title="Chọn năm phát hành"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1420,6 +1588,7 @@ export default function MoviesPage() {
                   alignItems: "center",
                   gap: "0.5rem",
                 }}
+                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-1 sm:gap-2"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor =
                     "rgba(34, 197, 94, 0.3)";
@@ -1469,6 +1638,7 @@ export default function MoviesPage() {
                     alignItems: "center",
                     gap: "0.5rem",
                   }}
+                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-3 py-2 sm:px-6 sm:py-3 text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-2"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor =
                       "rgba(239, 68, 68, 0.3)";
@@ -1494,9 +1664,10 @@ export default function MoviesPage() {
       </section>
 
       {/* Movies Grid */}
-      <section style={{ padding: "2rem 0" }}>
+      <section style={{ padding: "2rem 0" }} className="py-4 sm:py-8">
         <div
           style={{ maxWidth: "1200px", margin: "0 auto", padding: "0 1rem" }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         >
           {/* Pagination Info */}
           <div
@@ -1507,8 +1678,9 @@ export default function MoviesPage() {
               marginBottom: "2rem",
               color: "#9ca3af",
             }}
+            className="flex justify-between items-center mb-4 sm:mb-8 text-gray-400"
           >
-            <p>
+            <p className="text-xs sm:text-base">
               Trang {currentPage} / {totalPages} - Tổng {movies?.total || 0}{" "}
               phim
             </p>
@@ -1518,9 +1690,10 @@ export default function MoviesPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 250px))",
                 gap: "1.5rem",
               }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4 md:gap-6 justify-center"
             >
               {movies?.data.map((movie) => (
                 <div
@@ -1532,7 +1705,10 @@ export default function MoviesPage() {
                     boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
                     transition: "transform 0.3s, box-shadow 0.3s",
                     cursor: "pointer",
+                    maxWidth: "250px",
+                    width: "100%",
                   }}
+                  className="bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[250px] w-full mx-auto"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "scale(1.05)";
                     e.currentTarget.style.boxShadow =
@@ -1555,6 +1731,7 @@ export default function MoviesPage() {
                       position: "relative",
                       overflow: "hidden",
                     }}
+                    className="aspect-[3/4] bg-cover bg-center relative overflow-hidden"
                   >
                     <div
                       style={{
@@ -1574,6 +1751,7 @@ export default function MoviesPage() {
                         right: "0.75rem",
                         zIndex: 30,
                       }}
+                      className="absolute top-2 right-2 z-30"
                     >
                       <span
                         style={{
@@ -1585,6 +1763,7 @@ export default function MoviesPage() {
                             movie.status === "END" ? "#10b981" : "#f59e0b",
                           color: "white",
                         }}
+                        className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium text-white"
                       >
                         {movie.status === "END" ? "Hoàn thành" : movie.status}
                       </span>
@@ -1609,6 +1788,7 @@ export default function MoviesPage() {
                             backgroundColor: "#dc2626",
                             color: "white",
                           }}
+                          className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium text-white"
                         >
                           📺 {movie.series}
                         </span>
@@ -1634,6 +1814,7 @@ export default function MoviesPage() {
                             backgroundColor: "rgba(0,0,0,0.8)",
                             color: "white",
                           }}
+                          className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium text-white"
                         >
                           Tập {movie.episode}
                         </span>
@@ -1673,6 +1854,7 @@ export default function MoviesPage() {
                           marginBottom: "0.25rem",
                           lineHeight: "1.25",
                         }}
+                        className="text-white font-semibold text-sm sm:text-lg mb-1 leading-tight line-clamp-2"
                       >
                         {movie.title}
                       </h3>
@@ -1684,6 +1866,7 @@ export default function MoviesPage() {
                             marginBottom: "0.5rem",
                             fontStyle: "italic",
                           }}
+                          className="text-gray-300 text-xs sm:text-sm mb-2 italic"
                         >
                           {movie.originalTitle}
                         </p>
@@ -1692,7 +1875,7 @@ export default function MoviesPage() {
                   </div>
 
                   {/* Movie Details */}
-                  <div style={{ padding: "1rem" }}>
+                  <div style={{ padding: "1rem" }} className="p-2 sm:p-4">
                     <div
                       style={{
                         display: "flex",
@@ -1702,6 +1885,7 @@ export default function MoviesPage() {
                         color: "#d1d5db",
                         marginBottom: "1rem",
                       }}
+                      className="flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3"
                     >
                       <div
                         style={{
@@ -1709,11 +1893,14 @@ export default function MoviesPage() {
                           alignItems: "center",
                           gap: "0.5rem",
                         }}
+                        className="flex items-center gap-1 sm:gap-2"
                       >
                         <span style={{ color: "#dc2626" }}>📅</span>
-                        <span>{movie.year}</span>
+                        <span className="text-xs sm:text-sm">{movie.year}</span>
                         <span style={{ color: "#6b7280" }}>•</span>
-                        <span>{movie.country}</span>
+                        <span className="text-xs sm:text-sm">
+                          {movie.country}
+                        </span>
                       </div>
                       <div
                         style={{
@@ -1721,11 +1908,16 @@ export default function MoviesPage() {
                           alignItems: "center",
                           gap: "0.5rem",
                         }}
+                        className="flex items-center gap-1 sm:gap-2"
                       >
                         <span style={{ color: "#dc2626" }}>⏱️</span>
-                        <span>{movie.duration}</span>
+                        <span className="text-xs sm:text-sm">
+                          {movie.duration}
+                        </span>
                         <span style={{ color: "#6b7280" }}>•</span>
-                        <span>{movie.episodes} tập</span>
+                        <span className="text-xs sm:text-sm">
+                          {movie.episodes} tập
+                        </span>
                       </div>
                       <div
                         style={{
@@ -1733,9 +1925,13 @@ export default function MoviesPage() {
                           alignItems: "center",
                           gap: "0.5rem",
                         }}
+                        className="flex items-center gap-1 sm:gap-2"
                       >
                         <span style={{ color: "#dc2626" }}>🎭</span>
-                        <span style={{ color: "#9ca3af" }}>
+                        <span
+                          style={{ color: "#9ca3af" }}
+                          className="text-xs sm:text-sm text-gray-400"
+                        >
                           {movie.category}
                         </span>
                       </div>
@@ -1935,6 +2131,7 @@ export default function MoviesPage() {
                 gap: "1rem",
                 marginTop: "3rem",
               }}
+              className="flex justify-center items-center gap-1 sm:gap-4 mt-6 sm:mt-12"
             >
               <button
                 onClick={() => fetchMovies(currentPage - 1)}
@@ -1954,6 +2151,7 @@ export default function MoviesPage() {
                   minWidth: "3rem",
                   transition: "all 0.3s ease",
                 }}
+                className="p-1.5 sm:p-3 bg-gray-700 disabled:bg-gray-600 text-white border-none rounded-lg cursor-pointer disabled:cursor-not-allowed text-sm sm:text-xl font-medium flex items-center justify-center min-w-[2rem] sm:min-w-[3rem] transition-all duration-300"
                 onMouseEnter={(e) => {
                   if (currentPage !== 1) {
                     e.currentTarget.style.backgroundColor = "#b91c1c";
@@ -1971,7 +2169,10 @@ export default function MoviesPage() {
               </button>
 
               {/* Page Numbers */}
-              <div style={{ display: "flex", gap: "0.5rem" }}>
+              <div
+                style={{ display: "flex", gap: "0.5rem" }}
+                className="flex gap-1 sm:gap-2"
+              >
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let pageNum;
                   if (totalPages <= 5) {
@@ -2004,6 +2205,7 @@ export default function MoviesPage() {
                         alignItems: "center",
                         justifyContent: "center",
                       }}
+                      className="p-2 sm:p-3 px-2 sm:px-4 bg-gray-700 data-[active=true]:bg-red-600 text-white border-none rounded-lg cursor-pointer text-sm sm:text-base font-medium min-w-[2rem] sm:min-w-[3rem] transition-all duration-300 flex items-center justify-center"
                       onMouseEnter={(e) => {
                         if (currentPage !== pageNum) {
                           e.currentTarget.style.backgroundColor = "#4b5563";
@@ -2043,6 +2245,7 @@ export default function MoviesPage() {
                   minWidth: "3rem",
                   transition: "all 0.3s ease",
                 }}
+                className="p-1.5 sm:p-3 bg-gray-700 disabled:bg-gray-600 text-white border-none rounded-lg cursor-pointer disabled:cursor-not-allowed text-sm sm:text-xl font-medium flex items-center justify-center min-w-[2rem] sm:min-w-[3rem] transition-all duration-300"
                 onMouseEnter={(e) => {
                   if (currentPage !== totalPages) {
                     e.currentTarget.style.backgroundColor = "#b91c1c";
@@ -2071,6 +2274,22 @@ export default function MoviesPage() {
           }
           100% {
             transform: rotate(360deg);
+          }
+        }
+
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        @media (max-width: 640px) {
+          .search-container:focus-within {
+            transform: scale(1.02);
+            border-color: #dc2626;
+            background-color: rgba(55, 65, 81, 0.95);
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.2);
           }
         }
       `}</style>

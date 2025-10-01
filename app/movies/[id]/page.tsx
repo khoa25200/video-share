@@ -455,15 +455,27 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             <h2 className="text-2xl font-bold text-white mb-6">
               📺 {movie.series} - Tất cả tập ({totalEpisodes} tập)
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 250px))",
+                gap: "1rem",
+                justifyContent: "center",
+              }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 justify-center"
+            >
               {relatedEpisodes.map((episode) => (
                 <div
                   key={episode.id}
-                  className={`bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
+                  className={`bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer max-w-[250px] w-full mx-auto ${
                     episode.id === movie.id
                       ? "border-primary-500 ring-2 ring-primary-500/20"
                       : "border-dark-700 hover:border-primary-500/50"
                   }`}
+                  style={{
+                    maxWidth: "250px",
+                    width: "100%",
+                  }}
                   onClick={() => {
                     window.location.href = `/movies/${episode.id}`;
                   }}
@@ -478,22 +490,22 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                     }}
                   >
                     {/* Episode Badge */}
-                    <div className="absolute top-2 left-2 bg-primary-600 text-white px-2 py-1 rounded text-xs font-bold">
+                    <div className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-primary-600 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-xs font-bold">
                       Tập {episode.episode}
                     </div>
 
                     {/* Current Episode Indicator */}
                     {episode.id === movie.id && (
-                      <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-bold">
+                      <div className="absolute top-1 sm:top-2 right-1 sm:right-2 bg-green-600 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-xs font-bold">
                         Đang xem
                       </div>
                     )}
 
                     {/* Play Overlay */}
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
+                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-primary-600 rounded-full flex items-center justify-center">
                         <svg
-                          className="w-6 h-6 text-white ml-0.5"
+                          className="w-4 h-4 sm:w-6 sm:h-6 text-white ml-0.5"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -504,14 +516,14 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                   </div>
 
                   {/* Episode Info */}
-                  <div className="p-3">
-                    <h3 className="text-white text-sm font-medium line-clamp-2 mb-1">
+                  <div className="p-2 sm:p-3">
+                    <h3 className="text-white text-xs sm:text-sm font-medium line-clamp-2 mb-1">
                       {episode.title}
                     </h3>
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <span>{episode.duration}</span>
                       <span
-                        className={`px-2 py-1 rounded ${
+                        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-xs ${
                           episode.status === "END"
                             ? "bg-green-600/20 text-green-400"
                             : "bg-yellow-600/20 text-yellow-400"
