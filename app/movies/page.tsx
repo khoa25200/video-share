@@ -786,6 +786,7 @@ export default function MoviesPage() {
             <div className="block sm:hidden px-1">
               <div
                 className="relative overflow-hidden rounded-2xl shadow-2xl"
+                style={{ minHeight: "450px" }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
                 onTouchStart={() => setIsHovering(true)}
@@ -794,7 +795,7 @@ export default function MoviesPage() {
                 }}
               >
                 <div
-                  className="flex transition-transform ease-in-out duration-500"
+                  className="flex transition-transform ease-in-out duration-500 h-full"
                   style={{
                     transform: `translateX(-${currentHighlightIndex * 100}%)`,
                   }}
@@ -803,7 +804,7 @@ export default function MoviesPage() {
                     <div
                       key={movie.id}
                       className="w-full flex-shrink-0 relative mx-1"
-                      style={{ aspectRatio: "9/16", minHeight: "400px" }}
+                      style={{ aspectRatio: "9/16", minHeight: "450px" }}
                       onClick={() => handlePlay(movie)}
                     >
                       <div
@@ -827,7 +828,7 @@ export default function MoviesPage() {
                         </div>
 
                         {/* Bottom Content */}
-                        <div className="absolute bottom-0 left-0 right-0 p-4 z-20 text-white">
+                        <div className="absolute bottom-0 left-0 right-0 p-4 pb-8 z-20 text-white">
                           {/* Highlight Badge */}
                           <div className="mb-3">
                             <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-bold bg-yellow-500 text-white rounded-lg shadow-lg">
@@ -859,24 +860,6 @@ export default function MoviesPage() {
                               ))}
                             </div>
                           </div>
-
-                          {/* Action Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePlay(movie);
-                            }}
-                            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-2 px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition-all duration-200 shadow-lg border border-red-500/20"
-                          >
-                            <svg
-                              className="w-3.5 h-3.5"
-                              fill="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                            Xem ngay
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -884,7 +867,7 @@ export default function MoviesPage() {
                 </div>
 
                 {/* Slider Indicators */}
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex space-x-1.5">
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30 flex space-x-1.5">
                   {highlights.map((_, index) => (
                     <button
                       key={index}
