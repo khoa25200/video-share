@@ -16,6 +16,7 @@ export interface Movie {
   description: string;
   iframe: string;
   thumbnail: string;
+  mobileThumbnail?: string; // Mobile banner thumbnail
   videoUrl?: string; // Optional video URL for MP4/M3U8 files
   series?: string; // Series name for grouping
   episode?: string; // Episode number within series
@@ -111,6 +112,7 @@ export async function getSheetData(): Promise<Movie[]> {
           description: "description",
           iframe: "iframe",
           thumbnail: "thumbnail",
+          mobileThumbnail: "mobileThumbnail",
           videoUrl: "videoUrl",
           series: "series",
           episode: "episode",
@@ -146,7 +148,7 @@ export async function getHighlightData(): Promise<Movie[]> {
     }
 
     // Lấy dữ liệu từ sheet highlight
-    const range = "hight_light!A:Q";
+    const range = "hight_light!A:R"; // Updated to include mobileThumbnail column
 
     const requestOptions: any = {
       spreadsheetId,
@@ -191,6 +193,7 @@ export async function getHighlightData(): Promise<Movie[]> {
           description: "description",
           iframe: "iframe",
           thumbnail: "thumbnail",
+          mobileThumbnail: "mobileThumbnail",
           videoUrl: "videoUrl",
           series: "series",
           episode: "episode",

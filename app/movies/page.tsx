@@ -17,6 +17,7 @@ interface Movie {
   description: string;
   iframe: string;
   thumbnail: string;
+  mobileThumbnail?: string; // Mobile banner thumbnail
   series?: string;
   episode?: string;
   ranking?: string;
@@ -45,6 +46,7 @@ export default function MoviesPage() {
   const [highlights, setHighlights] = useState<Movie[]>([]);
   const [highlightsLoading, setHighlightsLoading] = useState(true);
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
   const [visibleHighlights, setVisibleHighlights] = useState(3);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [topRanking, setTopRanking] = useState<Movie[]>([]);
@@ -453,13 +455,13 @@ export default function MoviesPage() {
 
   // Auto-rotate carousel
   useEffect(() => {
-    if (highlights.length > 1) {
+    if (highlights.length > 1 && !isHovering) {
       const interval = setInterval(() => {
         setCurrentHighlightIndex((prev) => (prev + 1) % highlights.length);
       }, 5000); // Change slide every 5 seconds
       return () => clearInterval(interval);
     }
-  }, [highlights.length]);
+  }, [highlights.length, isHovering]);
 
   const handlePlay = (movie: Movie) => {
     // Chuyển hướng đến trang chi tiết phim
@@ -780,145 +782,138 @@ export default function MoviesPage() {
               </p>
             </div>
 
-            {/* Mobile Grid View */}
-            <div className="block sm:hidden">
-              <div className="grid grid-cols-1 gap-3">
-                {highlights.slice(0, visibleHighlights).map((movie) => (
-                  <div
-                    key={movie.id}
-                    style={{
-                      position: "relative",
-                      aspectRatio: "16/9",
-                      backgroundImage: `url(${movie.thumbnail})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      borderRadius: "0.75rem",
-                      overflow: "hidden",
-                      cursor: "pointer",
-                    }}
-                    className="relative aspect-video bg-cover bg-center rounded-lg overflow-hidden cursor-pointer"
-                    onClick={() => handlePlay(movie)}
-                  >
-                    {/* Overlay */}
+            {/* Mobile Slider View */}
+            <div className="block sm:hidden px-1">
+              <div
+                className="relative overflow-hidden rounded-2xl shadow-2xl"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+                onTouchStart={() => setIsHovering(true)}
+                onTouchEnd={() => {
+                  setTimeout(() => setIsHovering(false), 2000);
+                }}
+              >
+                <div
+                  className="flex transition-transform ease-in-out duration-500"
+                  style={{
+                    transform: `translateX(-${currentHighlightIndex * 100}%)`,
+                  }}
+                >
+                  {highlights.map((movie) => (
                     <div
-                      style={{
-                        position: "absolute",
-                        inset: 0,
-                        background:
-                          "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3))",
-                        zIndex: 10,
-                      }}
-                    />
-
-                    {/* Content */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: "1rem",
-                        zIndex: 20,
-                        color: "white",
-                      }}
-                      className="absolute bottom-0 left-0 right-0 p-4 z-20 text-white"
+                      key={movie.id}
+                      className="w-full flex-shrink-0 relative mx-1"
+                      style={{ aspectRatio: "9/16", minHeight: "400px" }}
+                      onClick={() => handlePlay(movie)}
                     >
-                      {/* Highlight Badge */}
-                      <div className="mb-2">
-                        <span
-                          style={{
-                            padding: "0.25rem 0.5rem",
-                            borderRadius: "9999px",
-                            fontSize: "0.625rem",
-                            fontWeight: "bold",
-                            backgroundColor: "#f59e0b",
-                            color: "white",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "0.125rem",
-                          }}
-                          className="px-2 py-1 text-xs font-bold bg-yellow-500 text-white rounded-full inline-flex items-center gap-1"
-                        >
-                          ⭐ PHIM NỔI BẬT
-                        </span>
-                      </div>
-
-                      {/* Movie Title */}
-                      <h3
-                        style={{
-                          fontSize: "1rem",
-                          fontWeight: "bold",
-                          marginBottom: "0.5rem",
-                          lineHeight: "1.2",
-                        }}
-                        className="text-base font-bold mb-2 leading-tight line-clamp-2"
-                      >
-                        {movie.title}
-                      </h3>
-
-                      {/* Movie Info */}
                       <div
+                        className="w-full h-full bg-cover bg-center rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.75rem",
-                          fontSize: "0.75rem",
-                          color: "#9ca3af",
-                          marginBottom: "0.5rem",
+                          backgroundImage: `url(${
+                            movie.mobileThumbnail || movie.thumbnail
+                          })`,
                         }}
-                        className="flex items-center gap-2 text-sm text-gray-400 mb-2"
                       >
-                        <span>📅 {movie.year}</span>
-                        <span>•</span>
-                        <span>🌍 {movie.country}</span>
-                        <span>•</span>
-                        <span>⏱️ {movie.duration}</span>
-                      </div>
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
 
-                      {/* Description */}
-                      <p
-                        style={{
-                          fontSize: "0.75rem",
-                          lineHeight: "1.4",
-                          color: "#d1d5db",
-                          maxWidth: "100%",
-                        }}
-                        className="text-sm leading-relaxed text-gray-300 line-clamp-2"
+                        {/* Status Badge */}
+                        <div className="absolute top-3 left-3 z-20">
+                          <span className="px-2 py-1 text-xs font-bold bg-red-600 text-white rounded-lg shadow-lg">
+                            {movie.status === "END"
+                              ? "Hoàn thành"
+                              : movie.status}
+                          </span>
+                        </div>
+
+                        {/* Bottom Content */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 z-20 text-white">
+                          {/* Highlight Badge */}
+                          <div className="mb-3">
+                            <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-bold bg-yellow-500 text-white rounded-lg shadow-lg">
+                              ⭐ HOT
+                            </span>
+                          </div>
+
+                          {/* Movie Title */}
+                          <h3 className="text-lg font-bold mb-1 leading-tight text-white line-clamp-2 drop-shadow-lg">
+                            {movie.title}
+                          </h3>
+
+                          {/* Movie Info Row */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2 text-xs text-gray-300">
+                              <span>{movie.year}</span>
+                              <span>•</span>
+                              <span>{movie.category}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <svg
+                                  key={i}
+                                  className="w-3 h-3 text-yellow-400 fill-current"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Action Button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePlay(movie);
+                            }}
+                            className="w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white py-2 px-3 rounded-xl font-medium text-xs flex items-center justify-center gap-1.5 transition-all duration-200 shadow-lg border border-red-500/20"
+                          >
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                            Xem ngay
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Slider Indicators */}
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex space-x-1.5">
+                  {highlights.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentHighlightIndex(index)}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        index === currentHighlightIndex
+                          ? "w-8 bg-white shadow-lg"
+                          : "w-1.5 bg-white/60 hover:bg-white/80"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Swipe Hint */}
+                {highlights.length > 1 && (
+                  <div className="absolute top-3 right-3 z-30">
+                    <div className="flex items-center gap-1 text-white/70">
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 24 24"
                       >
-                        {movie.description}
-                      </p>
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                      </svg>
+                      <span className="text-xs font-medium">Vuốt</span>
                     </div>
                   </div>
-                ))}
-              </div>
-
-              {/* Load More Button */}
-              {highlights.length > 3 &&
-                visibleHighlights < highlights.length && (
-                  <div className="flex justify-center mt-4">
-                    <button
-                      onClick={() =>
-                        setVisibleHighlights((prev) =>
-                          Math.min(prev + 3, highlights.length)
-                        )
-                      }
-                      style={{
-                        padding: "0.75rem 1.5rem",
-                        backgroundColor: "#dc2626",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "0.5rem",
-                        fontSize: "0.875rem",
-                        fontWeight: "600",
-                        cursor: "pointer",
-                        transition: "all 0.3s ease",
-                      }}
-                      className="px-6 py-3 bg-red-600 text-white border-none rounded-lg text-sm font-semibold cursor-pointer transition-all duration-300 hover:bg-red-700 hover:scale-105"
-                    >
-                      Xem thêm ({highlights.length - visibleHighlights} phim)
-                    </button>
-                  </div>
                 )}
+              </div>
             </div>
 
             {/* Desktop Carousel View */}
@@ -2230,21 +2225,21 @@ export default function MoviesPage() {
                 onClick={() => fetchMovies(currentPage - 1)}
                 disabled={currentPage === 1}
                 style={{
-                  padding: "0.75rem",
+                  padding: "0.5rem",
                   backgroundColor: currentPage === 1 ? "#374151" : "#dc2626",
                   color: "white",
                   border: "none",
                   borderRadius: "0.5rem",
                   cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                  fontSize: "1.2rem",
+                  fontSize: "1rem",
                   fontWeight: "500",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  minWidth: "3rem",
+                  minWidth: "2.5rem",
                   transition: "all 0.3s ease",
                 }}
-                className="p-1.5 sm:p-3 bg-gray-700 disabled:bg-gray-600 text-white border-none rounded-lg cursor-pointer disabled:cursor-not-allowed text-sm sm:text-xl font-medium flex items-center justify-center min-w-[2rem] sm:min-w-[3rem] transition-all duration-300"
+                className="p-1.5 sm:p-2.5 bg-gray-700 disabled:bg-gray-600 text-white border-none rounded-lg cursor-pointer disabled:cursor-not-allowed text-sm sm:text-lg font-medium flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] transition-all duration-300"
                 onMouseEnter={(e) => {
                   if (currentPage !== 1) {
                     e.currentTarget.style.backgroundColor = "#b91c1c";
@@ -2283,22 +2278,22 @@ export default function MoviesPage() {
                       key={pageNum}
                       onClick={() => fetchMovies(pageNum)}
                       style={{
-                        padding: "0.75rem 1rem",
+                        padding: "0.5rem 0.75rem",
                         backgroundColor:
                           currentPage === pageNum ? "#dc2626" : "#374151",
                         color: "white",
                         border: "none",
                         borderRadius: "0.5rem",
                         cursor: "pointer",
-                        fontSize: "1rem",
+                        fontSize: "0.875rem",
                         fontWeight: "500",
-                        minWidth: "3rem",
+                        minWidth: "2rem",
                         transition: "all 0.3s ease",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
-                      className="p-2 sm:p-3 px-2 sm:px-4 bg-gray-700 data-[active=true]:bg-red-600 text-white border-none rounded-lg cursor-pointer text-sm sm:text-base font-medium min-w-[2rem] sm:min-w-[3rem] transition-all duration-300 flex items-center justify-center"
+                      className="p-1.5 sm:p-2.5 px-2 sm:px-3 bg-gray-700 data-[active=true]:bg-red-600 text-white border-none rounded-lg cursor-pointer text-xs sm:text-sm font-medium min-w-[1.5rem] sm:min-w-[2.5rem] transition-all duration-300 flex items-center justify-center"
                       onMouseEnter={(e) => {
                         if (currentPage !== pageNum) {
                           e.currentTarget.style.backgroundColor = "#4b5563";
@@ -2322,7 +2317,7 @@ export default function MoviesPage() {
                 onClick={() => fetchMovies(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 style={{
-                  padding: "0.75rem",
+                  padding: "0.5rem",
                   backgroundColor:
                     currentPage === totalPages ? "#374151" : "#dc2626",
                   color: "white",
@@ -2330,15 +2325,15 @@ export default function MoviesPage() {
                   borderRadius: "0.5rem",
                   cursor:
                     currentPage === totalPages ? "not-allowed" : "pointer",
-                  fontSize: "1.2rem",
+                  fontSize: "1rem",
                   fontWeight: "500",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  minWidth: "3rem",
+                  minWidth: "2.5rem",
                   transition: "all 0.3s ease",
                 }}
-                className="p-1.5 sm:p-3 bg-gray-700 disabled:bg-gray-600 text-white border-none rounded-lg cursor-pointer disabled:cursor-not-allowed text-sm sm:text-xl font-medium flex items-center justify-center min-w-[2rem] sm:min-w-[3rem] transition-all duration-300"
+                className="p-1.5 sm:p-2.5 bg-gray-700 disabled:bg-gray-600 text-white border-none rounded-lg cursor-pointer disabled:cursor-not-allowed text-sm sm:text-lg font-medium flex items-center justify-center min-w-[2rem] sm:min-w-[2.5rem] transition-all duration-300"
                 onMouseEnter={(e) => {
                   if (currentPage !== totalPages) {
                     e.currentTarget.style.backgroundColor = "#b91c1c";

@@ -172,11 +172,20 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           {/* Movie Poster */}
           <div className="lg:col-span-1">
             <div
-              className="aspect-[3/4] rounded-xl overflow-hidden shadow-2xl"
+              className="aspect-[3/4] rounded-xl overflow-hidden shadow-2xl cursor-pointer transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
               style={{
                 backgroundImage: `url(${movie.thumbnail})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
+              }}
+              onClick={() => {
+                // Scroll to video player section
+                const videoSection = document.querySelector(
+                  "[data-video-section]"
+                );
+                if (videoSection) {
+                  videoSection.scrollIntoView({ behavior: "smooth" });
+                }
               }}
             >
               <div className="relative h-full">
@@ -232,14 +241,16 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                   {[...Array(5)].map((_, i) => (
                     <svg
                       key={i}
-                      className="w-5 h-5 text-yellow-400 fill-current"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-yellow-400 fill-current"
                       viewBox="0 0 24 24"
                     >
                       <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
                   ))}
                 </div>
-                <span className="text-gray-400">4.8/5</span>
+                <span className="text-gray-400 text-sm sm:text-base">
+                  4.8/5
+                </span>
               </div>
 
               {/* Description */}
@@ -254,11 +265,11 @@ export default function MovieDetail({ params }: MovieDetailProps) {
               </div>
 
               {/* Movie Details */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
                     <svg
-                      className="w-5 h-5 text-primary-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -270,7 +281,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                       />
                     </svg>
-                    <span className="text-gray-300">
+                    <span className="text-gray-300 text-sm sm:text-base">
                       Năm:{" "}
                       <span className="text-white font-medium">
                         {movie.year}
@@ -280,7 +291,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
                   <div className="flex items-center space-x-3">
                     <svg
-                      className="w-5 h-5 text-primary-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -298,7 +309,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                       />
                     </svg>
-                    <span className="text-gray-300">
+                    <span className="text-gray-300 text-sm sm:text-base">
                       Quốc gia:{" "}
                       <span className="text-white font-medium">
                         {movie.country}
@@ -308,7 +319,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
                   <div className="flex items-center space-x-3">
                     <svg
-                      className="w-5 h-5 text-primary-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -320,7 +331,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                         d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h3a1 1 0 110 2h-1v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6H4a1 1 0 110-2h3z"
                       />
                     </svg>
-                    <span className="text-gray-300">
+                    <span className="text-gray-300 text-sm sm:text-base">
                       Thể loại:{" "}
                       <span className="text-white font-medium">
                         {movie.category}
@@ -332,7 +343,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
                     <svg
-                      className="w-5 h-5 text-primary-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -344,7 +355,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                         d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
-                    <span className="text-gray-300">
+                    <span className="text-gray-300 text-sm sm:text-base">
                       Thời lượng:{" "}
                       <span className="text-white font-medium">
                         {movie.duration}
@@ -354,7 +365,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
                   <div className="flex items-center space-x-3">
                     <svg
-                      className="w-5 h-5 text-primary-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -366,7 +377,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                         d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                       />
                     </svg>
-                    <span className="text-gray-300">
+                    <span className="text-gray-300 text-sm sm:text-base">
                       Tập:{" "}
                       <span className="text-white font-medium">
                         {movie.episodes}
@@ -376,7 +387,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
                   <div className="flex items-center space-x-3">
                     <svg
-                      className="w-5 h-5 text-primary-400"
+                      className="w-6 h-6 sm:w-7 sm:h-7 text-primary-400 flex-shrink-0"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -388,7 +399,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                       />
                     </svg>
-                    <span className="text-gray-300">
+                    <span className="text-gray-300 text-sm sm:text-base">
                       Diễn viên:{" "}
                       <span className="text-white font-medium">
                         {movie.actors}
