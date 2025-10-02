@@ -132,6 +132,12 @@ export async function GET(request: NextRequest) {
     // Filter by series if specified
     if (series) {
       allData = allData.filter((movie: any) => movie.series === series);
+      // Sort episodes by episode number in ascending order
+      allData = allData.sort((a: any, b: any) => {
+        const episodeA = parseInt(a.episode || "0");
+        const episodeB = parseInt(b.episode || "0");
+        return episodeA - episodeB;
+      });
     } else {
       // For main movies list, only show episode 1 of each series
       const seriesMap = new Map();
