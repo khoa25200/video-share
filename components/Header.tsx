@@ -62,7 +62,7 @@ export default function Header() {
             </a>
           </nav>
 
-          {/* Mode Toggle Only */}
+          {/* Desktop Mode Toggle */}
           <div className="hidden md:flex items-center">
             {/* Mode Toggle */}
             <div className="flex items-center bg-dark-800 rounded-lg p-1">
@@ -89,54 +89,51 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden text-white hover:text-primary-400 transition-colors"
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+          {/* Mobile Controls */}
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Mobile Mode Toggle */}
+            <div className="flex items-center bg-dark-800 rounded-lg p-0.5">
+              <button
+                onClick={() => setMode("girl")}
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                  mode === "girl"
+                    ? "bg-primary-600 text-white"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                👩
+              </button>
+              <button
+                onClick={() => setMode("boy")}
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                  mode === "boy"
+                    ? "bg-primary-600 text-white"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                👨
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white hover:text-primary-400 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-dark-700">
             <div className="space-y-4">
-              {/* Mobile Mode Toggle */}
-              <div className="flex items-center bg-dark-800 rounded-lg p-1">
-                <button
-                  onClick={() => {
-                    setMode("girl");
-                    setIsMenuOpen(false);
-                  }}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    mode === "girl"
-                      ? "bg-primary-600 text-white"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  👩 Phim Girl
-                </button>
-                <button
-                  onClick={() => {
-                    setMode("boy");
-                    setIsMenuOpen(false);
-                  }}
-                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    mode === "boy"
-                      ? "bg-primary-600 text-white"
-                      : "text-gray-400 hover:text-white"
-                  }`}
-                >
-                  👨 Phim Boy
-                </button>
-              </div>
-
               {/* Mobile Navigation */}
               <nav className="space-y-2">
                 <a
