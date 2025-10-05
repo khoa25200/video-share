@@ -13,7 +13,10 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
+          <a
+            href="/"
+            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+          >
             <img
               src="/assets/logo.jpg"
               alt="GLVIETSUB Logo"
@@ -23,7 +26,7 @@ export default function Header() {
               <h1 className="text-xl font-bold gradient-text">GLVIETSUB</h1>
               <p className="text-xs text-gray-400">Xem phim online HD</p>
             </div>
-          </div>
+          </a>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

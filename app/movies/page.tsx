@@ -36,7 +36,7 @@ interface MoviesResponse {
 }
 
 export default function MoviesPage() {
-  const { mode } = useMode();
+  const { mode, isInitialized } = useMode();
   const [movies, setMovies] = useState<MoviesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -409,6 +409,13 @@ export default function MoviesPage() {
     }
   }, []);
 
+  // Initial data fetch when component mounts and mode is initialized
+  useEffect(() => {
+    if (isInitialized) {
+      fetchAllData();
+    }
+  }, [isInitialized]);
+
   // Refetch movies when active filters change or mode changes
   useEffect(() => {
     fetchMovies(1);
@@ -479,6 +486,37 @@ export default function MoviesPage() {
     const match = iframe.match(/src="([^"]+)"/);
     return match ? match[1] : "";
   };
+
+  // Show loading if mode context is not initialized
+  if (!isInitialized) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#111827",
+          color: "white",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <div
+            style={{
+              width: "3rem",
+              height: "3rem",
+              border: "2px solid #374151",
+              borderTop: "2px solid white",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+              margin: "0 auto 1rem",
+            }}
+          ></div>
+          <p style={{ fontSize: "1.125rem" }}>Đang khởi tạo...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

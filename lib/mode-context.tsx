@@ -14,30 +14,39 @@ interface ModeContextType {
   mode: MovieMode;
   setMode: (mode: MovieMode) => void;
   modeLabel: string;
+  isInitialized: boolean;
 }
 
 const ModeContext = createContext<ModeContextType | undefined>(undefined);
 
 export function ModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setMode] = useState<MovieMode>("girl");
-
-  // Load mode from localStorage on mount
-  useEffect(() => {
-    const savedMode = localStorage.getItem("movie-mode") as MovieMode;
-    if (savedMode && (savedMode === "girl" || savedMode === "boy")) {
-      setMode(savedMode);
+  const [mode, setMode] = useState<MovieMode>(() => {
+    if (typeof window !== "undefined") {
+      const savedMode = localStorage.getItem("movie-mode") as MovieMode;
+      return savedMode && (savedMode === "girl" || savedMode === "boy")
+        ? savedMode
+        : "girl";
     }
+    return "girl";
+  });
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Mark as initialized after first render
+  useEffect(() => {
+    setIsInitialized(true);
   }, []);
 
   // Save mode to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem("movie-mode", mode);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("movie-mode", mode);
+    }
   }, [mode]);
 
   const modeLabel = mode === "girl" ? "Phim Girl" : "Phim Boy";
 
   return (
-    <ModeContext.Provider value={{ mode, setMode, modeLabel }}>
+    <ModeContext.Provider value={{ mode, setMode, modeLabel, isInitialized }}>
       {children}
     </ModeContext.Provider>
   );
