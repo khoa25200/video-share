@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { sendTelegramNotification, getUserIP } from "@/lib/telegram";
 import { useMode } from "@/lib/mode-context";
 import Header from "@/components/Header";
+import styles from "@/styles/movie-grid.module.css";
 
 interface Movie {
   id: string;
@@ -1056,11 +1057,11 @@ export default function MoviesPage() {
                 {mode === "girl" ? "👩 Phim Girl" : "👨 Phim Boy"}
               </span>
             </h2>
-            {/* Mobile Layout: Top 3 above, 2 below */}
+            {/* Mobile Layout: Top 2 above, 3 below */}
             <div className="block sm:hidden">
-              {/* Top 3 Movies */}
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                {topRanking.slice(0, 3).map((movie, index) => (
+              {/* Top 2 Movies */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {topRanking.slice(0, 2).map((movie, index) => (
                   <div
                     key={movie.id}
                     style={{
@@ -1180,6 +1181,11 @@ export default function MoviesPage() {
                           style={{
                             fontSize: "0.625rem",
                             color: "#9ca3af",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                           }}
                         >
                           {movie.category}
@@ -1190,9 +1196,9 @@ export default function MoviesPage() {
                 ))}
               </div>
 
-              {/* Bottom 2 Movies */}
-              <div className="grid grid-cols-2 gap-2">
-                {topRanking.slice(3, 5).map((movie, index) => (
+              {/* Bottom 3 Movies */}
+              <div className="grid grid-cols-3 gap-2">
+                {topRanking.slice(2, 5).map((movie, index) => (
                   <div
                     key={movie.id}
                     style={{
@@ -1224,7 +1230,12 @@ export default function MoviesPage() {
                         position: "absolute",
                         top: "0.5rem",
                         left: "0.5rem",
-                        backgroundColor: index === 0 ? "#8b5cf6" : "#06b6d4",
+                        backgroundColor:
+                          index === 0
+                            ? "#cd7f32"
+                            : index === 1
+                            ? "#8b5cf6"
+                            : "#06b6d4",
                         color: "white",
                         padding: "0.25rem 0.5rem",
                         borderRadius: "0.25rem",
@@ -1305,6 +1316,11 @@ export default function MoviesPage() {
                           style={{
                             fontSize: "0.75rem",
                             color: "#9ca3af",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                           }}
                         >
                           {movie.category}
@@ -1884,28 +1900,11 @@ export default function MoviesPage() {
           </div>
 
           {viewMode === "grid" ? (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(100px, 150px))",
-                gap: "0.5rem",
-              }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 sm:gap-2 md:gap-4 justify-center"
-            >
+            <div className={styles.movieGrid}>
               {movies?.data.map((movie) => (
                 <div
                   key={movie.id}
-                  style={{
-                    backgroundColor: "#1f2937",
-                    borderRadius: "0.25rem",
-                    overflow: "hidden",
-                    boxShadow: "0 2px 4px -1px rgba(0, 0, 0, 0.1)",
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    cursor: "pointer",
-                    maxWidth: "150px",
-                    width: "100%",
-                  }}
-                  className="bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto"
+                  className={`${styles.movieCard} bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto`}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "scale(1.05)";
                     e.currentTarget.style.boxShadow =
@@ -1920,15 +1919,10 @@ export default function MoviesPage() {
                 >
                   {/* Movie Poster */}
                   <div
+                    className={`${styles.moviePoster} aspect-[2/3] bg-cover bg-center relative overflow-hidden`}
                     style={{
-                      aspectRatio: "3/4",
                       backgroundImage: `url(${movie.thumbnail})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      position: "relative",
-                      overflow: "hidden",
                     }}
-                    className="aspect-[2/3] bg-cover bg-center relative overflow-hidden"
                   >
                     <div
                       style={{
@@ -1941,26 +1935,13 @@ export default function MoviesPage() {
                     />
 
                     {/* Status Badge */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "0.125rem",
-                        right: "0.125rem",
-                        zIndex: 30,
-                      }}
-                      className="absolute top-1 right-1 z-30"
-                    >
+                    <div className={styles.statusBadge}>
                       <span
-                        style={{
-                          padding: "0.0625rem 0.125rem",
-                          borderRadius: "9999px",
-                          fontSize: "0.5rem",
-                          fontWeight: "500",
-                          backgroundColor:
-                            movie.status === "END" ? "#10b981" : "#f59e0b",
-                          color: "white",
-                        }}
-                        className="px-1 py-0.5 rounded-full text-xs font-medium text-white"
+                        className={`${styles.badge} ${
+                          movie.status === "END"
+                            ? styles.statusCompleted
+                            : styles.statusOngoing
+                        } px-1 py-0.5 rounded-full text-xs font-medium text-white`}
                       >
                         {movie.status === "END" ? "Hoàn thành" : movie.status}
                       </span>
@@ -1968,24 +1949,9 @@ export default function MoviesPage() {
 
                     {/* Series Badge */}
                     {movie.series && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "0.125rem",
-                          left: "0.125rem",
-                          zIndex: 30,
-                        }}
-                      >
+                      <div className={styles.seriesBadge}>
                         <span
-                          style={{
-                            padding: "0.0625rem 0.125rem",
-                            borderRadius: "9999px",
-                            fontSize: "0.5rem",
-                            fontWeight: "500",
-                            backgroundColor: "#dc2626",
-                            color: "white",
-                          }}
-                          className="px-0.5 py-0.5 rounded-full text-xs font-medium text-white"
+                          className={`${styles.badge} ${styles.seriesBadgeColor} px-0.5 py-0.5 rounded-full text-xs font-medium text-white`}
                         >
                           📺 {movie.series}
                         </span>
@@ -1994,24 +1960,9 @@ export default function MoviesPage() {
 
                     {/* Episode Badge */}
                     {movie.episode && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          bottom: "0.125rem",
-                          left: "0.125rem",
-                          zIndex: 30,
-                        }}
-                      >
+                      <div className={styles.episodeBadge}>
                         <span
-                          style={{
-                            padding: "0.0625rem 0.125rem",
-                            borderRadius: "9999px",
-                            fontSize: "0.5rem",
-                            fontWeight: "500",
-                            backgroundColor: "rgba(0,0,0,0.8)",
-                            color: "white",
-                          }}
-                          className="px-0.5 py-0.5 rounded-full text-xs font-medium text-white"
+                          className={`${styles.badge} ${styles.episodeBadgeColor} px-0.5 py-0.5 rounded-full text-xs font-medium text-white`}
                         >
                           Tập {movie.episode}
                         </span>
@@ -2033,47 +1984,15 @@ export default function MoviesPage() {
                     />
 
                     {/* Movie Info */}
-                    <div
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        padding: "0.125rem",
-                        zIndex: 20,
-                      }}
-                    >
+                    <div className={styles.movieInfo}>
                       <h3
-                        style={{
-                          color: "white",
-                          fontWeight: "600",
-                          fontSize: "0.5rem",
-                          marginBottom: "0.125rem",
-                          lineHeight: "1.2",
-                          display: "-webkit-box",
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: "vertical",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                        className="text-white font-semibold text-xs mb-1 leading-tight"
+                        className={`${styles.movieTitle} text-white font-semibold text-xs mb-1 leading-tight`}
                       >
                         {movie.title}
                       </h3>
                       {movie.originalTitle && (
                         <p
-                          style={{
-                            color: "#d1d5db",
-                            fontSize: "0.375rem",
-                            marginBottom: "0.125rem",
-                            fontStyle: "italic",
-                            display: "-webkit-box",
-                            WebkitLineClamp: 1,
-                            WebkitBoxOrient: "vertical",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                          className="text-gray-300 text-xs mb-1 italic"
+                          className={`${styles.originalTitle} text-gray-300 text-xs mb-1 italic`}
                         >
                           {movie.originalTitle}
                         </p>
@@ -2082,62 +2001,46 @@ export default function MoviesPage() {
                   </div>
 
                   {/* Movie Details */}
-                  <div style={{ padding: "0.25rem" }} className="p-1">
+                  <div className={styles.movieDetails}>
                     <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.125rem",
-                        fontSize: "0.375rem",
-                        color: "#d1d5db",
-                        marginBottom: "0.25rem",
-                      }}
-                      className="flex flex-col gap-0.5 text-xs text-gray-300 mb-1"
+                      className={`${styles.detailsContainer} flex flex-col gap-0.5 text-xs text-gray-300 mb-1`}
                     >
                       <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                        }}
-                        className="flex items-center gap-1"
+                        className={`${styles.detailItem} flex items-center gap-1`}
                       >
-                        <span style={{ color: "#dc2626", fontSize: "0.5rem" }}>
+                        <span className={`${styles.detailIcon} text-xs`}>
                           📅
                         </span>
-                        <span className="text-xs">{movie.year}</span>
+                        <span className={`${styles.detailText} text-xs`}>
+                          {movie.year}
+                        </span>
                         <span style={{ color: "#6b7280" }}>•</span>
-                        <span className="text-xs">{movie.country}</span>
+                        <span className={`${styles.detailText} text-xs`}>
+                          {movie.country}
+                        </span>
                       </div>
                       <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                        }}
-                        className="flex items-center gap-1"
+                        className={`${styles.detailItem} flex items-center gap-1`}
                       >
-                        <span style={{ color: "#dc2626", fontSize: "0.5rem" }}>
+                        <span className={`${styles.detailIcon} text-xs`}>
                           ⏱️
                         </span>
-                        <span className="text-xs">{movie.duration}</span>
+                        <span className={`${styles.detailText} text-xs`}>
+                          {movie.duration}
+                        </span>
                         <span style={{ color: "#6b7280" }}>•</span>
-                        <span className="text-xs">{movie.episodes} tập</span>
+                        <span className={`${styles.detailText} text-xs`}>
+                          {movie.episodes} tập
+                        </span>
                       </div>
                       <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "0.25rem",
-                        }}
-                        className="flex items-center gap-1"
+                        className={`${styles.detailItem} flex items-center gap-1`}
                       >
-                        <span style={{ color: "#dc2626", fontSize: "0.5rem" }}>
+                        <span className={`${styles.detailIcon} text-xs`}>
                           🎭
                         </span>
                         <span
-                          style={{ color: "#9ca3af" }}
-                          className="text-xs text-gray-400"
+                          className={`${styles.detailText} text-xs text-gray-400`}
                         >
                           {movie.category}
                         </span>
