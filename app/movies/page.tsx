@@ -1654,13 +1654,13 @@ export default function MoviesPage() {
                   color: "white",
                   border: "1px solid #4b5563",
                   borderRadius: "15px",
-                  padding: "0.375rem 0.75rem",
-                  fontSize: "0.75rem",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.875rem",
                   cursor: "pointer",
-                  minWidth: "80px",
+                  minWidth: "100px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer min-w-[60px] sm:min-w-[200px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer min-w-[80px] sm:min-w-[220px] transition-all duration-300"
                 title="Chọn thể loại phim"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1706,13 +1706,13 @@ export default function MoviesPage() {
                   color: "white",
                   border: "1px solid #4b5563",
                   borderRadius: "15px",
-                  padding: "0.375rem 0.75rem",
-                  fontSize: "0.75rem",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.875rem",
                   cursor: "pointer",
-                  minWidth: "80px",
+                  minWidth: "100px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer min-w-[60px] sm:min-w-[200px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer min-w-[80px] sm:min-w-[220px] transition-all duration-300"
                 title="Chọn quốc gia"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1758,13 +1758,13 @@ export default function MoviesPage() {
                   color: "white",
                   border: "1px solid #4b5563",
                   borderRadius: "15px",
-                  padding: "0.375rem 0.75rem",
-                  fontSize: "0.75rem",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.875rem",
                   cursor: "pointer",
-                  minWidth: "80px",
+                  minWidth: "100px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer min-w-[60px] sm:min-w-[200px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer min-w-[80px] sm:min-w-[220px] transition-all duration-300"
                 title="Chọn năm phát hành"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1792,8 +1792,8 @@ export default function MoviesPage() {
                   color: "#22c55e",
                   border: "1px solid rgba(34, 197, 94, 0.3)",
                   borderRadius: "15px",
-                  padding: "0.375rem 0.75rem",
-                  fontSize: "0.75rem",
+                  padding: "0.5rem 1rem",
+                  fontSize: "0.875rem",
                   cursor: "pointer",
                   fontWeight: "500",
                   transition: "all 0.3s ease",
@@ -1801,7 +1801,7 @@ export default function MoviesPage() {
                   alignItems: "center",
                   gap: "0.25rem",
                 }}
-                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
+                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor =
                     "rgba(34, 197, 94, 0.3)";
@@ -1842,8 +1842,8 @@ export default function MoviesPage() {
                     color: "#ef4444",
                     border: "1px solid rgba(239, 68, 68, 0.3)",
                     borderRadius: "15px",
-                    padding: "0.375rem 0.75rem",
-                    fontSize: "0.75rem",
+                    padding: "0.5rem 1rem",
+                    fontSize: "0.875rem",
                     cursor: "pointer",
                     fontWeight: "500",
                     transition: "all 0.3s ease",
@@ -1851,7 +1851,7 @@ export default function MoviesPage() {
                     alignItems: "center",
                     gap: "0.25rem",
                   }}
-                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
+                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor =
                       "rgba(239, 68, 68, 0.3)";
