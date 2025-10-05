@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Menu, X, Play, Star } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { useMode } from "@/lib/mode-context";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { mode, setMode, modeLabel } = useMode();
 
   return (
     <header className="sticky top-0 z-50 bg-dark-900/95 backdrop-blur-md border-b border-dark-700">
@@ -58,21 +59,31 @@ export default function Header() {
             </a>
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Tìm kiếm phim..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-dark-800 border border-dark-600 rounded-lg pl-10 pr-4 py-2 w-64 text-white placeholder-gray-400 focus:outline-none focus:border-primary-500 transition-colors"
-              />
+          {/* Mode Toggle Only */}
+          <div className="hidden md:flex items-center">
+            {/* Mode Toggle */}
+            <div className="flex items-center bg-dark-800 rounded-lg p-1">
+              <button
+                onClick={() => setMode("girl")}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  mode === "girl"
+                    ? "bg-primary-600 text-white"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                👩 Phim Girl
+              </button>
+              <button
+                onClick={() => setMode("boy")}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  mode === "boy"
+                    ? "bg-primary-600 text-white"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                👨 Phim Boy
+              </button>
             </div>
-            <button className="btn-primary">
-              <Search className="w-4 h-4" />
-            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -93,16 +104,34 @@ export default function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-dark-700">
             <div className="space-y-4">
-              {/* Mobile Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Tìm kiếm phim..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-dark-800 border border-dark-600 rounded-lg pl-10 pr-4 py-2 w-full text-white placeholder-gray-400 focus:outline-none focus:border-primary-500 transition-colors"
-                />
+              {/* Mobile Mode Toggle */}
+              <div className="flex items-center bg-dark-800 rounded-lg p-1">
+                <button
+                  onClick={() => {
+                    setMode("girl");
+                    setIsMenuOpen(false);
+                  }}
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    mode === "girl"
+                      ? "bg-primary-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  👩 Phim Girl
+                </button>
+                <button
+                  onClick={() => {
+                    setMode("boy");
+                    setIsMenuOpen(false);
+                  }}
+                  className={`flex-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    mode === "boy"
+                      ? "bg-primary-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                >
+                  👨 Phim Boy
+                </button>
               </div>
 
               {/* Mobile Navigation */}

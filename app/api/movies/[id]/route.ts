@@ -8,6 +8,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const { searchParams } = new URL(request.url);
+    const mode = searchParams.get("mode") || "girl";
 
     if (!id) {
       return NextResponse.json(
@@ -17,7 +19,8 @@ export async function GET(
     }
 
     // Lấy dữ liệu từ Google Sheets
-    const allData = await getSheetData();
+    const sheetName = mode === "boy" ? "main_boy" : "main";
+    const allData = await getSheetData(sheetName);
 
     // Tìm movie theo ID
     const movie = allData.find((item: any) => item.id === id);

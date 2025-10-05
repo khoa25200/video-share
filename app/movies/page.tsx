@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { sendTelegramNotification, getUserIP } from "@/lib/telegram";
+import { useMode } from "@/lib/mode-context";
+import Header from "@/components/Header";
 
 interface Movie {
   id: string;
@@ -34,6 +36,7 @@ interface MoviesResponse {
 }
 
 export default function MoviesPage() {
+  const { mode } = useMode();
   const [movies, setMovies] = useState<MoviesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +114,7 @@ export default function MoviesPage() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "12",
+        mode: mode,
       });
 
       if (activeSearchQuery) params.append("search", activeSearchQuery);
@@ -180,7 +184,7 @@ export default function MoviesPage() {
   const fetchHighlights = async () => {
     try {
       setHighlightsLoading(true);
-      const response = await fetch("/api/highlights");
+      const response = await fetch(`/api/highlights?mode=${mode}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch highlights");
@@ -198,7 +202,7 @@ export default function MoviesPage() {
   const fetchTopRanking = async () => {
     try {
       setRankingLoading(true);
-      const response = await fetch("/api/ranking");
+      const response = await fetch(`/api/ranking?mode=${mode}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch top ranking movies");
@@ -217,7 +221,7 @@ export default function MoviesPage() {
   const fetchAvailableTypes = async () => {
     try {
       setTypesLoading(true);
-      const response = await fetch("/api/types");
+      const response = await fetch(`/api/types?mode=${mode}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch available types");
@@ -236,7 +240,7 @@ export default function MoviesPage() {
   const fetchAvailableCountries = async () => {
     try {
       setCountriesLoading(true);
-      const response = await fetch("/api/countries");
+      const response = await fetch(`/api/countries?mode=${mode}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch available countries");
@@ -255,7 +259,7 @@ export default function MoviesPage() {
   const fetchAvailableYears = async () => {
     try {
       setYearsLoading(true);
-      const response = await fetch("/api/years");
+      const response = await fetch(`/api/years?mode=${mode}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch available years");
@@ -290,12 +294,12 @@ export default function MoviesPage() {
         countriesResponse,
         yearsResponse,
       ] = await Promise.all([
-        fetch("/api/movies?page=1&limit=12"),
-        fetch("/api/highlights"),
-        fetch("/api/ranking"),
-        fetch("/api/types"),
-        fetch("/api/countries"),
-        fetch("/api/years"),
+        fetch(`/api/movies?page=1&limit=12&mode=${mode}`),
+        fetch(`/api/highlights?mode=${mode}`),
+        fetch(`/api/ranking?mode=${mode}`),
+        fetch(`/api/types?mode=${mode}`),
+        fetch(`/api/countries?mode=${mode}`),
+        fetch(`/api/years?mode=${mode}`),
       ]);
 
       // Xử lý movies data
@@ -369,8 +373,6 @@ export default function MoviesPage() {
   };
 
   useEffect(() => {
-    fetchAllData();
-
     // Gửi thông báo Telegram khi user truy cập
     const sendNotification = async () => {
       try {
@@ -407,10 +409,15 @@ export default function MoviesPage() {
     }
   }, []);
 
-  // Refetch movies when active filters change
+  // Refetch movies when active filters change or mode changes
   useEffect(() => {
     fetchMovies(1);
-  }, [activeSearchQuery, activeCategory, activeYear, activeCountry]);
+  }, [activeSearchQuery, activeCategory, activeYear, activeCountry, mode]);
+
+  // Refetch all data when mode changes
+  useEffect(() => {
+    fetchAllData();
+  }, [mode]);
 
   // Function to apply search and filters
   const applyFilters = () => {
@@ -533,229 +540,7 @@ export default function MoviesPage() {
       style={{ minHeight: "100vh", backgroundColor: "#111827", color: "white" }}
     >
       {/* Header */}
-      <header
-        id="header-section"
-        style={{
-          backgroundColor: "#1f2937",
-          padding: "1rem 0",
-          borderBottom: "1px solid #374151",
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-        }}
-      >
-        <div
-          style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1rem" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div
-              style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}
-            >
-              <img
-                src="/assets/logo.jpg"
-                alt="GLVIETSUB Logo"
-                style={{
-                  width: "2.5rem",
-                  height: "2.5rem",
-                  borderRadius: "0.5rem",
-                  objectFit: "cover",
-                }}
-              />
-              <div>
-                <h1
-                  style={{ fontSize: "1.25rem", fontWeight: "bold", margin: 0 }}
-                >
-                  GLVIETSUB
-                </h1>
-                <p style={{ fontSize: "0.75rem", color: "#9ca3af", margin: 0 }}>
-                  Xem phim online HD
-                </p>
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav
-              style={{
-                display: "flex",
-                gap: "2rem",
-                alignItems: "center",
-              }}
-              className="hidden md:flex"
-            >
-              <a href="/" style={{ color: "white", textDecoration: "none" }}>
-                Trang chủ
-              </a>
-
-              <a
-                href="/movies"
-                style={{ color: "white", textDecoration: "none" }}
-              >
-                Phim Reels
-              </a>
-
-              {/* View Mode Toggle */}
-              <div
-                style={{ display: "flex", gap: "0.5rem", marginLeft: "1rem" }}
-              >
-                <button
-                  onClick={() => setViewMode("grid")}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    backgroundColor:
-                      viewMode === "grid" ? "#dc2626" : "#374151",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  📋 Lưới
-                </button>
-                <button
-                  onClick={() => setViewMode("series")}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    backgroundColor:
-                      viewMode === "series" ? "#dc2626" : "#374151",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  📺 Series
-                </button>
-              </div>
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              style={{
-                display: "none",
-                backgroundColor: "transparent",
-                border: "none",
-                color: "white",
-                fontSize: "1.5rem",
-                cursor: "pointer",
-                padding: "0.5rem",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              className="md:hidden"
-            >
-              {isMobileMenuOpen ? "✕" : "☰"}
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMobileMenuOpen && (
-            <div
-              style={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                right: 0,
-                backgroundColor: "#111827",
-                borderTop: "1px solid #374151",
-                padding: "1rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "1rem",
-                zIndex: 40,
-              }}
-              className="md:hidden"
-            >
-              <a
-                href="/"
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid #374151",
-                }}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Trang chủ
-              </a>
-
-              <a
-                href="/movies"
-                style={{
-                  color: "white",
-                  textDecoration: "none",
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid #374151",
-                }}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Phim Reels
-              </a>
-
-              {/* Mobile View Mode Toggle */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: "0.5rem",
-                  padding: "0.5rem 0",
-                  borderBottom: "1px solid #374151",
-                }}
-              >
-                <button
-                  onClick={() => {
-                    setViewMode("grid");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    backgroundColor:
-                      viewMode === "grid" ? "#dc2626" : "#374151",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    transition: "all 0.3s ease",
-                    flex: 1,
-                  }}
-                >
-                  📋 Lưới
-                </button>
-                <button
-                  onClick={() => {
-                    setViewMode("series");
-                    setIsMobileMenuOpen(false);
-                  }}
-                  style={{
-                    padding: "0.5rem 1rem",
-                    backgroundColor:
-                      viewMode === "series" ? "#dc2626" : "#374151",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    transition: "all 0.3s ease",
-                    flex: 1,
-                  }}
-                >
-                  📺 Series
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
+      <Header />
 
       {/* Highlights Section */}
       {!highlightsLoading && highlights.length > 0 && (
@@ -776,6 +561,9 @@ export default function MoviesPage() {
                 }}
               >
                 ⭐ PHIM NỔI BẬT
+                <span className={`mode-indicator ${mode}`}>
+                  {mode === "girl" ? "👩 Phim Girl" : "👨 Phim Boy"}
+                </span>
               </h2>
               <p style={{ color: "#9ca3af", fontSize: "1rem" }}>
                 Những bộ phim được yêu thích nhất
@@ -877,6 +665,7 @@ export default function MoviesPage() {
                           ? "w-8 bg-white shadow-lg"
                           : "w-1.5 bg-white/60 hover:bg-white/80"
                       }`}
+                      title={`Chuyển đến slide ${index + 1}`}
                     />
                   ))}
                 </div>
@@ -1189,9 +978,16 @@ export default function MoviesPage() {
                 color: "white",
                 marginBottom: "1.5rem",
                 textAlign: "center",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
               }}
             >
               🏆 TOP 5 PHIM XEM NHIỀU NHẤT
+              <span className={`mode-indicator ${mode}`}>
+                {mode === "girl" ? "👩 Phim Girl" : "👨 Phim Boy"}
+              </span>
             </h2>
             <div
               style={{

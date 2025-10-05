@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Movie } from "@/lib/google-sheets";
 import VideoPlayer from "@/components/VideoPlayer";
+import { useMode } from "@/lib/mode-context";
 
 interface MovieDetailProps {
   params: Promise<{
@@ -11,6 +12,7 @@ interface MovieDetailProps {
 }
 
 export default function MovieDetail({ params }: MovieDetailProps) {
+  const { mode } = useMode();
   const [movie, setMovie] = useState<Movie | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
     const fetchMovie = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/movies/${movieId}`);
+        const response = await fetch(`/api/movies/${movieId}?mode=${mode}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch movie");
@@ -50,7 +52,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             const episodesResponse = await fetch(
               `/api/movies?series=${encodeURIComponent(
                 data.series
-              )}&page=1&limit=10`
+              )}&page=1&limit=10&mode=${mode}`
             );
             if (episodesResponse.ok) {
               const episodesData = await episodesResponse.json();
@@ -73,7 +75,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
     };
 
     fetchMovie();
-  }, [movieId]);
+  }, [movieId, mode]);
 
   const loadMoreEpisodes = async () => {
     if (loadingEpisodes || !hasMoreEpisodes) return;
@@ -85,7 +87,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
       const episodesResponse = await fetch(
         `/api/movies?series=${encodeURIComponent(
           movie?.series || ""
-        )}&page=${nextPage}&limit=10`
+        )}&page=${nextPage}&limit=10&mode=${mode}`
       );
 
       if (episodesResponse.ok) {

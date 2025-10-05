@@ -72,3 +72,38 @@
     filter: drop-shadow(0 0 20px #ffd700) drop-shadow(0 0 30px #ffd700) drop-shadow(0 0 40px #ffd700);
   }
 }
+
+/* Mode toggle button styles */
+.mode-toggle-button {
+  @apply px-3 py-2 rounded-md text-sm font-medium transition-all duration-200;
+}
+
+.mode-toggle-button.active {
+  @apply bg-primary-600 text-white;
+}
+
+.mode-toggle-button.inactive {
+  @apply text-gray-400 hover:text-white;
+}
+
+/* Mode indicator */
+.mode-indicator {
+  @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+}
+
+.mode-indicator.girl {
+  @apply bg-pink-100 text-pink-800;
+}
+
+.mode-indicator.boy {
+  @apply bg-blue-100 text-blue-800;
+}
+
+/* Button styles */
+.btn-primary {
+  @apply bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center;
+}
+
+.btn-secondary {
+  @apply bg-dark-700 hover:bg-dark-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center;
+}

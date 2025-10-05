@@ -4,10 +4,14 @@ import { getHighlightData } from "@/lib/google-sheets";
 // GET /api/highlights - Lấy danh sách phim nổi bật
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const mode = searchParams.get("mode") || "girl";
+
     // Lấy dữ liệu từ Google Sheets highlight sheet
     let allData;
     try {
-      allData = await getHighlightData();
+      const sheetName = mode === "boy" ? "hight_light_boy" : "hight_light";
+      allData = await getHighlightData(sheetName);
       console.log("Highlights data fetched - Status: success");
     } catch (error) {
       console.log("Highlights data fetch failed - Status: error");

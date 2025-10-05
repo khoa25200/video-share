@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const year = searchParams.get("year");
     const country = searchParams.get("country");
+    const mode = searchParams.get("mode") || "girl";
 
     // Validate pagination parameters
     if (page < 1 || limit < 1 || limit > 50) {
@@ -34,7 +35,8 @@ export async function GET(request: NextRequest) {
     // Lấy dữ liệu từ Google Sheets hoặc fallback về mock data
     let allData;
     try {
-      allData = await getSheetData();
+      const sheetName = mode === "boy" ? "main_boy" : "main";
+      allData = await getSheetData(sheetName);
       console.log("Movies data fetched - Status: success");
     } catch (error) {
       console.log("Movies data fetch failed - Status: error");

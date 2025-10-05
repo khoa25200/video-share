@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ModeProvider } from "@/lib/mode-context";
 
 export const metadata: Metadata = {
   title: "GLVIETSUB - Xem Phim Online HD",
@@ -19,7 +20,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
-      <body className="bg-dark-900 text-white min-h-screen">{children}</body>
+      <body className="bg-dark-900 text-white min-h-screen">
+        <ModeProvider>{children}</ModeProvider>
+      </body>
     </html>
   );
 }

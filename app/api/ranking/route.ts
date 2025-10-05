@@ -3,7 +3,11 @@ import { getTopRankingMovies } from "@/lib/google-sheets";
 
 export async function GET(request: NextRequest) {
   try {
-    const topMovies = await getTopRankingMovies();
+    const { searchParams } = new URL(request.url);
+    const mode = searchParams.get("mode") || "girl";
+
+    const sheetName = mode === "boy" ? "main_boy" : "main";
+    const topMovies = await getTopRankingMovies(sheetName);
 
     return NextResponse.json({
       success: true,

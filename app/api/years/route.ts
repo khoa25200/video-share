@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getUniqueYears } from "@/lib/google-sheets";
 
 // GET /api/years - Lấy danh sách các year unique
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const years = await getUniqueYears();
+    const { searchParams } = new URL(request.url);
+    const mode = searchParams.get("mode") || "girl";
+
+    const sheetName = mode === "boy" ? "main_boy" : "main";
+    const years = await getUniqueYears(sheetName);
 
     return NextResponse.json({
       success: true,

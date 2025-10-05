@@ -53,7 +53,7 @@ function getGoogleSheetsClient() {
 }
 
 // Helper function để lấy dữ liệu từ Google Sheets
-export async function getSheetData(): Promise<Movie[]> {
+export async function getSheetData(sheetName?: string): Promise<Movie[]> {
   try {
     const sheets = getGoogleSheetsClient();
     const spreadsheetId =
@@ -65,8 +65,9 @@ export async function getSheetData(): Promise<Movie[]> {
     }
 
     // Xác định range để lấy dữ liệu
-    const sheetName = process.env.GOOGLE_SHEET_NAME || "main";
-    const range = `${sheetName}!A:Q`; // Lấy từ cột A đến Q (17 cột) - bao gồm series, episode và ranking
+    const targetSheetName =
+      sheetName || process.env.GOOGLE_SHEET_NAME || "main";
+    const range = `${targetSheetName}!A:Q`; // Lấy từ cột A đến Q (17 cột) - bao gồm series, episode và ranking
 
     // Lấy dữ liệu từ sheet
     const requestOptions: any = {
@@ -136,7 +137,7 @@ export async function getSheetData(): Promise<Movie[]> {
 }
 
 // Lấy dữ liệu từ sheet highlight
-export async function getHighlightData(): Promise<Movie[]> {
+export async function getHighlightData(sheetName?: string): Promise<Movie[]> {
   try {
     const sheets = getGoogleSheetsClient();
     const spreadsheetId =
@@ -148,7 +149,8 @@ export async function getHighlightData(): Promise<Movie[]> {
     }
 
     // Lấy dữ liệu từ sheet highlight
-    const range = "hight_light!A:R"; // Updated to include mobileThumbnail column
+    const targetSheetName = sheetName || "hight_light";
+    const range = `${targetSheetName}!A:R`; // Updated to include mobileThumbnail column
 
     const requestOptions: any = {
       spreadsheetId,
@@ -217,9 +219,11 @@ export async function getHighlightData(): Promise<Movie[]> {
 }
 
 // Lấy top 5 phim theo ranking
-export async function getTopRankingMovies(): Promise<Movie[]> {
+export async function getTopRankingMovies(
+  sheetName?: string
+): Promise<Movie[]> {
   try {
-    const allMovies = await getSheetData();
+    const allMovies = await getSheetData(sheetName);
 
     // Lọc phim có ranking từ 1-5 và sắp xếp theo ranking
     const topMovies = allMovies
@@ -241,7 +245,7 @@ export async function getTopRankingMovies(): Promise<Movie[]> {
 }
 
 // Lấy danh sách các type unique từ Google Sheets (tối ưu truy vấn)
-export async function getUniqueTypes(): Promise<string[]> {
+export async function getUniqueTypes(sheetName?: string): Promise<string[]> {
   try {
     const sheets = getGoogleSheetsClient();
     const spreadsheetId =
@@ -253,8 +257,9 @@ export async function getUniqueTypes(): Promise<string[]> {
     }
 
     // Lấy chỉ cột type để tối ưu truy vấn
-    const sheetName = process.env.GOOGLE_SHEET_NAME || "main";
-    const range = `${sheetName}!L:L`; // Cột type là cột L
+    const targetSheetName =
+      sheetName || process.env.GOOGLE_SHEET_NAME || "main";
+    const range = `${targetSheetName}!L:L`; // Cột type là cột L
 
     const requestOptions: any = {
       spreadsheetId,
@@ -291,7 +296,9 @@ export async function getUniqueTypes(): Promise<string[]> {
 }
 
 // Lấy danh sách các country unique từ Google Sheets (tối ưu truy vấn)
-export async function getUniqueCountries(): Promise<string[]> {
+export async function getUniqueCountries(
+  sheetName?: string
+): Promise<string[]> {
   try {
     const sheets = getGoogleSheetsClient();
     const spreadsheetId =
@@ -303,8 +310,9 @@ export async function getUniqueCountries(): Promise<string[]> {
     }
 
     // Lấy chỉ cột country để tối ưu truy vấn
-    const sheetName = process.env.GOOGLE_SHEET_NAME || "main";
-    const range = `${sheetName}!D:D`; // Cột country là cột D
+    const targetSheetName =
+      sheetName || process.env.GOOGLE_SHEET_NAME || "main";
+    const range = `${targetSheetName}!D:D`; // Cột country là cột D
 
     const requestOptions: any = {
       spreadsheetId,
@@ -341,7 +349,7 @@ export async function getUniqueCountries(): Promise<string[]> {
 }
 
 // Lấy danh sách các year unique từ Google Sheets (tối ưu truy vấn)
-export async function getUniqueYears(): Promise<string[]> {
+export async function getUniqueYears(sheetName?: string): Promise<string[]> {
   try {
     const sheets = getGoogleSheetsClient();
     const spreadsheetId =
@@ -353,8 +361,9 @@ export async function getUniqueYears(): Promise<string[]> {
     }
 
     // Lấy chỉ cột year để tối ưu truy vấn
-    const sheetName = process.env.GOOGLE_SHEET_NAME || "main";
-    const range = `${sheetName}!H:H`; // Cột year là cột G
+    const targetSheetName =
+      sheetName || process.env.GOOGLE_SHEET_NAME || "main";
+    const range = `${targetSheetName}!H:H`; // Cột year là cột G
 
     const requestOptions: any = {
       spreadsheetId,
