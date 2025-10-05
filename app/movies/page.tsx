@@ -52,6 +52,8 @@ export default function MoviesPage() {
   const [isHovering, setIsHovering] = useState(false);
   const [visibleHighlights, setVisibleHighlights] = useState(3);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   const [topRanking, setTopRanking] = useState<Movie[]>([]);
   const [rankingLoading, setRankingLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -482,6 +484,34 @@ export default function MoviesPage() {
     window.location.href = `/movies/${movie.id}`;
   };
 
+  // Touch handling for mobile slider
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && highlights.length > 1) {
+      setCurrentHighlightIndex((prev) =>
+        prev === highlights.length - 1 ? 0 : prev + 1
+      );
+    }
+    if (isRightSwipe && highlights.length > 1) {
+      setCurrentHighlightIndex((prev) =>
+        prev === 0 ? highlights.length - 1 : prev - 1
+      );
+    }
+  };
+
   const extractVideoUrl = (iframe: string) => {
     const match = iframe.match(/src="([^"]+)"/);
     return match ? match[1] : "";
@@ -609,16 +639,15 @@ export default function MoviesPage() {
             </div>
 
             {/* Mobile Slider View */}
-            <div className="block sm:hidden px-1">
+            <div className="block sm:hidden px-2">
               <div
-                className="relative overflow-hidden rounded-2xl shadow-2xl"
-                style={{ minHeight: "450px" }}
+                className="relative overflow-hidden rounded-xl shadow-lg"
+                style={{ minHeight: "300px" }}
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
-                onTouchStart={() => setIsHovering(true)}
-                onTouchEnd={() => {
-                  setTimeout(() => setIsHovering(false), 2000);
-                }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 <div
                   className="flex transition-transform ease-in-out duration-500 h-full"
@@ -630,11 +659,11 @@ export default function MoviesPage() {
                     <div
                       key={movie.id}
                       className="w-full flex-shrink-0 relative mx-1"
-                      style={{ aspectRatio: "9/16", minHeight: "450px" }}
+                      style={{ aspectRatio: "16/9", minHeight: "300px" }}
                       onClick={() => handlePlay(movie)}
                     >
                       <div
-                        className="w-full h-full bg-cover bg-center rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
+                        className="w-full h-full bg-cover bg-center rounded-xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all duration-200"
                         style={{
                           backgroundImage: `url(${
                             movie.mobileThumbnail || movie.thumbnail
@@ -1027,6 +1056,267 @@ export default function MoviesPage() {
                 {mode === "girl" ? "👩 Phim Girl" : "👨 Phim Boy"}
               </span>
             </h2>
+            {/* Mobile Layout: Top 3 above, 2 below */}
+            <div className="block sm:hidden">
+              {/* Top 3 Movies */}
+              <div className="grid grid-cols-3 gap-2 mb-4">
+                {topRanking.slice(0, 3).map((movie, index) => (
+                  <div
+                    key={movie.id}
+                    style={{
+                      position: "relative",
+                      borderRadius: "0.5rem",
+                      overflow: "hidden",
+                      backgroundColor: "#334155",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                    }}
+                    onClick={() =>
+                      (window.location.href = `/movies/${movie.id}`)
+                    }
+                  >
+                    {/* Ranking Badge */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "0.5rem",
+                        left: "0.5rem",
+                        backgroundColor:
+                          index === 0
+                            ? "#ffd700"
+                            : index === 1
+                            ? "#c0c0c0"
+                            : index === 2
+                            ? "#cd7f32"
+                            : "#dc2626",
+                        color: "white",
+                        padding: "0.25rem 0.5rem",
+                        borderRadius: "0.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        zIndex: 30,
+                      }}
+                    >
+                      #{movie.ranking}
+                    </div>
+
+                    {/* Movie Poster */}
+                    <div style={{ position: "relative", aspectRatio: "2/3" }}>
+                      <img
+                        src={movie.thumbnail}
+                        alt={movie.title}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.src = "/placeholder-movie.jpg";
+                        }}
+                      />
+
+                      {/* Gradient Overlay for Title */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: "50%",
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
+                          zIndex: 15,
+                        }}
+                      />
+
+                      {/* Movie Info */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          padding: "0.5rem",
+                          zIndex: 20,
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: "0.75rem",
+                            fontWeight: "bold",
+                            color: "white",
+                            marginBottom: "0.25rem",
+                            lineHeight: "1.2",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {movie.title}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: "0.625rem",
+                            color: "#d1d5db",
+                            marginBottom: "0.25rem",
+                          }}
+                        >
+                          {movie.year} • {movie.country}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "0.625rem",
+                            color: "#9ca3af",
+                          }}
+                        >
+                          {movie.category}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bottom 2 Movies */}
+              <div className="grid grid-cols-2 gap-2">
+                {topRanking.slice(3, 5).map((movie, index) => (
+                  <div
+                    key={movie.id}
+                    style={{
+                      position: "relative",
+                      borderRadius: "0.5rem",
+                      overflow: "hidden",
+                      backgroundColor: "#334155",
+                      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                      cursor: "pointer",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.boxShadow =
+                        "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.boxShadow =
+                        "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
+                    }}
+                    onClick={() =>
+                      (window.location.href = `/movies/${movie.id}`)
+                    }
+                  >
+                    {/* Ranking Badge */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "0.5rem",
+                        left: "0.5rem",
+                        backgroundColor: index === 0 ? "#8b5cf6" : "#06b6d4",
+                        color: "white",
+                        padding: "0.25rem 0.5rem",
+                        borderRadius: "0.25rem",
+                        fontSize: "0.75rem",
+                        fontWeight: "bold",
+                        zIndex: 30,
+                      }}
+                    >
+                      #{movie.ranking}
+                    </div>
+
+                    {/* Movie Poster */}
+                    <div style={{ position: "relative", aspectRatio: "2/3" }}>
+                      <img
+                        src={movie.thumbnail}
+                        alt={movie.title}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                        onError={(e) => {
+                          e.currentTarget.src = "/placeholder-movie.jpg";
+                        }}
+                      />
+
+                      {/* Gradient Overlay for Title */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: "50%",
+                          background:
+                            "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)",
+                          zIndex: 15,
+                        }}
+                      />
+
+                      {/* Movie Info */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          padding: "0.75rem",
+                          zIndex: 20,
+                        }}
+                      >
+                        <h3
+                          style={{
+                            fontSize: "0.875rem",
+                            fontWeight: "bold",
+                            color: "white",
+                            marginBottom: "0.25rem",
+                            lineHeight: "1.2",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          {movie.title}
+                        </h3>
+                        <p
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#d1d5db",
+                            marginBottom: "0.25rem",
+                          }}
+                        >
+                          {movie.year} • {movie.country}
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "0.75rem",
+                            color: "#9ca3af",
+                          }}
+                        >
+                          {movie.category}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop Layout */}
             <div
               style={{
                 display: "grid",
@@ -1035,7 +1325,7 @@ export default function MoviesPage() {
                 marginBottom: "2rem",
                 justifyContent: "center",
               }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 justify-center"
+              className="hidden sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 justify-center"
             >
               {topRanking.map((movie, index) => (
                 <div
@@ -1074,7 +1364,9 @@ export default function MoviesPage() {
                           ? "#c0c0c0"
                           : index === 2
                           ? "#cd7f32"
-                          : "#dc2626",
+                          : index === 3
+                          ? "#8b5cf6"
+                          : "#06b6d4",
                       color: "white",
                       padding: "0.25rem 0.5rem",
                       borderRadius: "0.25rem",
@@ -1197,26 +1489,26 @@ export default function MoviesPage() {
                   backgroundColor: "rgba(55, 65, 81, 0.8)",
                   backdropFilter: "blur(10px)",
                   border: "2px solid transparent",
-                  borderRadius: "50px",
-                  padding: "0.75rem",
+                  borderRadius: "25px",
+                  padding: "0.375rem",
                   transition: "all 0.3s ease",
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-                  maxWidth: "600px",
+                  boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+                  maxWidth: "400px",
                   margin: "0 auto",
                 }}
-                className="search-container relative flex items-center bg-gray-700/80 backdrop-blur-sm border-2 border-transparent rounded-full p-2 sm:p-4 transition-all duration-300 shadow-lg max-w-2xl mx-auto"
+                className="search-container relative flex items-center bg-gray-700/80 backdrop-blur-sm border-2 border-transparent rounded-full p-1 sm:p-4 transition-all duration-300 shadow-lg max-w-xl mx-auto"
               >
                 <div
                   style={{
                     position: "absolute",
-                    left: "0.75rem",
+                    left: "0.375rem",
                     top: "50%",
                     transform: "translateY(-50%)",
                     color: "#9ca3af",
-                    fontSize: "1rem",
+                    fontSize: "0.75rem",
                     transition: "all 0.3s ease",
                   }}
-                  className="search-icon absolute left-3 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm sm:text-xl transition-all duration-300"
+                  className="search-icon absolute left-1.5 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs sm:text-xl transition-all duration-300"
                 >
                   🔍
                 </div>
@@ -1227,12 +1519,12 @@ export default function MoviesPage() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   style={{
                     flex: 1,
-                    padding: "0.5rem 0.75rem 0.5rem 2.5rem",
+                    padding: "0.25rem 0.375rem 0.25rem 1.5rem",
                     backgroundColor: "transparent",
                     border: "none",
                     outline: "none",
                     color: "white",
-                    fontSize: "0.875rem",
+                    fontSize: "0.75rem",
                     fontWeight: "400",
                   }}
                   onKeyPress={(e) => {
@@ -1273,17 +1565,17 @@ export default function MoviesPage() {
                     }}
                     style={{
                       position: "absolute",
-                      right: "0.75rem",
+                      right: "0.375rem",
                       top: "50%",
                       transform: "translateY(-50%)",
-                      width: "2.5rem",
-                      height: "2.5rem",
+                      width: "1.5rem",
+                      height: "1.5rem",
                       backgroundColor: "rgba(239, 68, 68, 0.2)",
                       color: "#ef4444",
                       border: "none",
                       borderRadius: "50%",
                       cursor: "pointer",
-                      fontSize: "1rem",
+                      fontSize: "0.75rem",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -1314,11 +1606,11 @@ export default function MoviesPage() {
               style={{
                 display: "flex",
                 flexWrap: "wrap",
-                gap: "1rem",
+                gap: "0.5rem",
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              className="flex flex-wrap gap-1 sm:gap-4 justify-center items-center"
+              className="flex flex-wrap gap-0.5 sm:gap-4 justify-center items-center"
             >
               {/* Category Filter */}
               <select
@@ -1345,14 +1637,14 @@ export default function MoviesPage() {
                   backgroundColor: "#374151",
                   color: "white",
                   border: "1px solid #4b5563",
-                  borderRadius: "25px",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "0.9rem",
+                  borderRadius: "15px",
+                  padding: "0.375rem 0.75rem",
+                  fontSize: "0.75rem",
                   cursor: "pointer",
-                  minWidth: "140px",
+                  minWidth: "80px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[100px] sm:min-w-[140px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[60px] sm:min-w-[140px] transition-all duration-300"
                 title="Chọn thể loại phim"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1397,14 +1689,14 @@ export default function MoviesPage() {
                   backgroundColor: "#374151",
                   color: "white",
                   border: "1px solid #4b5563",
-                  borderRadius: "25px",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "0.9rem",
+                  borderRadius: "15px",
+                  padding: "0.375rem 0.75rem",
+                  fontSize: "0.75rem",
                   cursor: "pointer",
-                  minWidth: "140px",
+                  minWidth: "80px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[100px] sm:min-w-[140px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[60px] sm:min-w-[140px] transition-all duration-300"
                 title="Chọn quốc gia"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1449,14 +1741,14 @@ export default function MoviesPage() {
                   backgroundColor: "#374151",
                   color: "white",
                   border: "1px solid #4b5563",
-                  borderRadius: "25px",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "0.9rem",
+                  borderRadius: "15px",
+                  padding: "0.375rem 0.75rem",
+                  fontSize: "0.75rem",
                   cursor: "pointer",
-                  minWidth: "140px",
+                  minWidth: "80px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[100px] sm:min-w-[140px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[60px] sm:min-w-[140px] transition-all duration-300"
                 title="Chọn năm phát hành"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1483,17 +1775,17 @@ export default function MoviesPage() {
                   backgroundColor: "rgba(34, 197, 94, 0.2)",
                   color: "#22c55e",
                   border: "1px solid rgba(34, 197, 94, 0.3)",
-                  borderRadius: "25px",
-                  padding: "0.75rem 1.5rem",
-                  fontSize: "0.9rem",
+                  borderRadius: "15px",
+                  padding: "0.375rem 0.75rem",
+                  fontSize: "0.75rem",
                   cursor: "pointer",
                   fontWeight: "500",
                   transition: "all 0.3s ease",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.5rem",
+                  gap: "0.25rem",
                 }}
-                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-1.5 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-1 sm:gap-2"
+                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-2"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor =
                     "rgba(34, 197, 94, 0.3)";
@@ -1533,17 +1825,17 @@ export default function MoviesPage() {
                     backgroundColor: "rgba(239, 68, 68, 0.2)",
                     color: "#ef4444",
                     border: "1px solid rgba(239, 68, 68, 0.3)",
-                    borderRadius: "25px",
-                    padding: "0.75rem 1.5rem",
-                    fontSize: "0.9rem",
+                    borderRadius: "15px",
+                    padding: "0.375rem 0.75rem",
+                    fontSize: "0.75rem",
                     cursor: "pointer",
                     fontWeight: "500",
                     transition: "all 0.3s ease",
                     display: "flex",
                     alignItems: "center",
-                    gap: "0.5rem",
+                    gap: "0.25rem",
                   }}
-                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-3 py-2 sm:px-6 sm:py-3 text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-2"
+                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-2"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor =
                       "rgba(239, 68, 68, 0.3)";
@@ -1595,25 +1887,25 @@ export default function MoviesPage() {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 250px))",
-                gap: "1.5rem",
+                gridTemplateColumns: "repeat(auto-fill, minmax(100px, 150px))",
+                gap: "0.5rem",
               }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4 md:gap-6 justify-center"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-1 sm:gap-2 md:gap-4 justify-center"
             >
               {movies?.data.map((movie) => (
                 <div
                   key={movie.id}
                   style={{
                     backgroundColor: "#1f2937",
-                    borderRadius: "0.75rem",
+                    borderRadius: "0.25rem",
                     overflow: "hidden",
-                    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 4px -1px rgba(0, 0, 0, 0.1)",
                     transition: "transform 0.3s, box-shadow 0.3s",
                     cursor: "pointer",
-                    maxWidth: "250px",
+                    maxWidth: "150px",
                     width: "100%",
                   }}
-                  className="bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[250px] w-full mx-auto"
+                  className="bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "scale(1.05)";
                     e.currentTarget.style.boxShadow =
@@ -1636,7 +1928,7 @@ export default function MoviesPage() {
                       position: "relative",
                       overflow: "hidden",
                     }}
-                    className="aspect-[3/4] bg-cover bg-center relative overflow-hidden"
+                    className="aspect-[2/3] bg-cover bg-center relative overflow-hidden"
                   >
                     <div
                       style={{
@@ -1652,23 +1944,23 @@ export default function MoviesPage() {
                     <div
                       style={{
                         position: "absolute",
-                        top: "0.75rem",
-                        right: "0.75rem",
+                        top: "0.125rem",
+                        right: "0.125rem",
                         zIndex: 30,
                       }}
-                      className="absolute top-2 right-2 z-30"
+                      className="absolute top-1 right-1 z-30"
                     >
                       <span
                         style={{
-                          padding: "0.25rem 0.5rem",
+                          padding: "0.0625rem 0.125rem",
                           borderRadius: "9999px",
-                          fontSize: "0.75rem",
+                          fontSize: "0.5rem",
                           fontWeight: "500",
                           backgroundColor:
                             movie.status === "END" ? "#10b981" : "#f59e0b",
                           color: "white",
                         }}
-                        className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium text-white"
+                        className="px-1 py-0.5 rounded-full text-xs font-medium text-white"
                       >
                         {movie.status === "END" ? "Hoàn thành" : movie.status}
                       </span>
@@ -1679,21 +1971,21 @@ export default function MoviesPage() {
                       <div
                         style={{
                           position: "absolute",
-                          top: "0.75rem",
-                          left: "0.75rem",
+                          top: "0.125rem",
+                          left: "0.125rem",
                           zIndex: 30,
                         }}
                       >
                         <span
                           style={{
-                            padding: "0.25rem 0.5rem",
+                            padding: "0.0625rem 0.125rem",
                             borderRadius: "9999px",
-                            fontSize: "0.75rem",
+                            fontSize: "0.5rem",
                             fontWeight: "500",
                             backgroundColor: "#dc2626",
                             color: "white",
                           }}
-                          className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium text-white"
+                          className="px-0.5 py-0.5 rounded-full text-xs font-medium text-white"
                         >
                           📺 {movie.series}
                         </span>
@@ -1705,21 +1997,21 @@ export default function MoviesPage() {
                       <div
                         style={{
                           position: "absolute",
-                          bottom: "0.75rem",
-                          left: "0.75rem",
+                          bottom: "0.125rem",
+                          left: "0.125rem",
                           zIndex: 30,
                         }}
                       >
                         <span
                           style={{
-                            padding: "0.25rem 0.5rem",
+                            padding: "0.0625rem 0.125rem",
                             borderRadius: "9999px",
-                            fontSize: "0.75rem",
+                            fontSize: "0.5rem",
                             fontWeight: "500",
                             backgroundColor: "rgba(0,0,0,0.8)",
                             color: "white",
                           }}
-                          className="px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium text-white"
+                          className="px-0.5 py-0.5 rounded-full text-xs font-medium text-white"
                         >
                           Tập {movie.episode}
                         </span>
@@ -1747,7 +2039,7 @@ export default function MoviesPage() {
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        padding: "1rem",
+                        padding: "0.125rem",
                         zIndex: 20,
                       }}
                     >
@@ -1755,11 +2047,16 @@ export default function MoviesPage() {
                         style={{
                           color: "white",
                           fontWeight: "600",
-                          fontSize: "1.125rem",
-                          marginBottom: "0.25rem",
-                          lineHeight: "1.25",
+                          fontSize: "0.5rem",
+                          marginBottom: "0.125rem",
+                          lineHeight: "1.2",
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
                         }}
-                        className="text-white font-semibold text-sm sm:text-lg mb-1 leading-tight line-clamp-2"
+                        className="text-white font-semibold text-xs mb-1 leading-tight"
                       >
                         {movie.title}
                       </h3>
@@ -1767,11 +2064,16 @@ export default function MoviesPage() {
                         <p
                           style={{
                             color: "#d1d5db",
-                            fontSize: "0.875rem",
-                            marginBottom: "0.5rem",
+                            fontSize: "0.375rem",
+                            marginBottom: "0.125rem",
                             fontStyle: "italic",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                           }}
-                          className="text-gray-300 text-xs sm:text-sm mb-2 italic"
+                          className="text-gray-300 text-xs mb-1 italic"
                         >
                           {movie.originalTitle}
                         </p>
@@ -1780,62 +2082,62 @@ export default function MoviesPage() {
                   </div>
 
                   {/* Movie Details */}
-                  <div style={{ padding: "1rem" }} className="p-2 sm:p-4">
+                  <div style={{ padding: "0.25rem" }} className="p-1">
                     <div
                       style={{
                         display: "flex",
                         flexDirection: "column",
-                        gap: "0.5rem",
-                        fontSize: "0.875rem",
+                        gap: "0.125rem",
+                        fontSize: "0.375rem",
                         color: "#d1d5db",
-                        marginBottom: "1rem",
+                        marginBottom: "0.25rem",
                       }}
-                      className="flex flex-col gap-1 sm:gap-2 text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3"
+                      className="flex flex-col gap-0.5 text-xs text-gray-300 mb-1"
                     >
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "0.5rem",
+                          gap: "0.25rem",
                         }}
-                        className="flex items-center gap-1 sm:gap-2"
+                        className="flex items-center gap-1"
                       >
-                        <span style={{ color: "#dc2626" }}>📅</span>
-                        <span className="text-xs sm:text-sm">{movie.year}</span>
-                        <span style={{ color: "#6b7280" }}>•</span>
-                        <span className="text-xs sm:text-sm">
-                          {movie.country}
+                        <span style={{ color: "#dc2626", fontSize: "0.5rem" }}>
+                          📅
                         </span>
+                        <span className="text-xs">{movie.year}</span>
+                        <span style={{ color: "#6b7280" }}>•</span>
+                        <span className="text-xs">{movie.country}</span>
                       </div>
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "0.5rem",
+                          gap: "0.25rem",
                         }}
-                        className="flex items-center gap-1 sm:gap-2"
+                        className="flex items-center gap-1"
                       >
-                        <span style={{ color: "#dc2626" }}>⏱️</span>
-                        <span className="text-xs sm:text-sm">
-                          {movie.duration}
+                        <span style={{ color: "#dc2626", fontSize: "0.5rem" }}>
+                          ⏱️
                         </span>
+                        <span className="text-xs">{movie.duration}</span>
                         <span style={{ color: "#6b7280" }}>•</span>
-                        <span className="text-xs sm:text-sm">
-                          {movie.episodes} tập
-                        </span>
+                        <span className="text-xs">{movie.episodes} tập</span>
                       </div>
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: "0.5rem",
+                          gap: "0.25rem",
                         }}
-                        className="flex items-center gap-1 sm:gap-2"
+                        className="flex items-center gap-1"
                       >
-                        <span style={{ color: "#dc2626" }}>🎭</span>
+                        <span style={{ color: "#dc2626", fontSize: "0.5rem" }}>
+                          🎭
+                        </span>
                         <span
                           style={{ color: "#9ca3af" }}
-                          className="text-xs sm:text-sm text-gray-400"
+                          className="text-xs text-gray-400"
                         >
                           {movie.category}
                         </span>
