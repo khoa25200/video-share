@@ -5,6 +5,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 175px));
   gap: 0.5rem;
+  justify-content: center;
 }
 
 .movieCard {
@@ -122,6 +123,7 @@
   .movieGrid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 250px));
     gap: 1.5rem;
+    justify-content: center;
   }
 
   .movieCard {

@@ -1475,7 +1475,7 @@ export default function MoviesPage() {
       <section
         id="filter-section"
         style={{ padding: "1rem 0", backgroundColor: "#1f2937" }}
-        className="py-4 sm:py-6 bg-gray-800"
+        className="py-4 sm:py-12 bg-gray-800"
       >
         <div
           style={{ maxWidth: "1280px", margin: "0 auto", padding: "0 1rem" }}
@@ -1487,7 +1487,7 @@ export default function MoviesPage() {
               flexDirection: "column",
               gap: "1rem",
             }}
-            className="flex flex-col gap-4 sm:gap-6"
+            className="flex flex-col gap-4 sm:gap-12"
           >
             {/* Search Bar - Full Width */}
             <div
@@ -1512,7 +1512,7 @@ export default function MoviesPage() {
                   maxWidth: "400px",
                   margin: "0 auto",
                 }}
-                className="search-container relative flex items-center bg-gray-700/80 backdrop-blur-sm border-2 border-transparent rounded-full p-1 sm:p-4 transition-all duration-300 shadow-lg max-w-xl mx-auto"
+                className="search-container relative flex items-center bg-gray-700/80 backdrop-blur-sm border-2 border-transparent rounded-full p-1 sm:p-8 transition-all duration-300 shadow-lg max-w-xl mx-auto"
               >
                 <div
                   style={{
@@ -1524,7 +1524,7 @@ export default function MoviesPage() {
                     fontSize: "0.75rem",
                     transition: "all 0.3s ease",
                   }}
-                  className="search-icon absolute left-1.5 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs sm:text-xl transition-all duration-300"
+                  className="search-icon absolute left-1.5 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs sm:text-3xl transition-all duration-300"
                 >
                   🔍
                 </div>
@@ -1540,9 +1540,9 @@ export default function MoviesPage() {
                     border: "none",
                     outline: "none",
                     color: "white",
-                    fontSize: "0.75rem",
                     fontWeight: "400",
                   }}
+                  className="text-xs sm:text-lg"
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -1626,7 +1626,7 @@ export default function MoviesPage() {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              className="flex flex-wrap gap-0.5 sm:gap-4 justify-center items-center"
+              className="flex flex-wrap gap-0.5 sm:gap-6 justify-center items-center"
             >
               {/* Category Filter */}
               <select
@@ -1660,7 +1660,7 @@ export default function MoviesPage() {
                   minWidth: "80px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[60px] sm:min-w-[140px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer min-w-[60px] sm:min-w-[200px] transition-all duration-300"
                 title="Chọn thể loại phim"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1712,7 +1712,7 @@ export default function MoviesPage() {
                   minWidth: "80px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[60px] sm:min-w-[140px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer min-w-[60px] sm:min-w-[200px] transition-all duration-300"
                 title="Chọn quốc gia"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1764,7 +1764,7 @@ export default function MoviesPage() {
                   minWidth: "80px",
                   transition: "all 0.3s ease",
                 }}
-                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer min-w-[60px] sm:min-w-[140px] transition-all duration-300"
+                className="bg-gray-700 text-white border border-gray-600 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer min-w-[60px] sm:min-w-[200px] transition-all duration-300"
                 title="Chọn năm phát hành"
                 onFocus={(e) => {
                   e.target.style.borderColor = "#dc2626";
@@ -1801,7 +1801,7 @@ export default function MoviesPage() {
                   alignItems: "center",
                   gap: "0.25rem",
                 }}
-                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-2"
+                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor =
                     "rgba(34, 197, 94, 0.3)";
@@ -1851,7 +1851,7 @@ export default function MoviesPage() {
                     alignItems: "center",
                     gap: "0.25rem",
                   }}
-                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-1 py-1 sm:px-6 sm:py-3 text-xs sm:text-sm cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-2"
+                  className="bg-red-500/20 text-red-400 border border-red-500/30 rounded-full px-1 py-1 sm:px-8 sm:py-4 text-xs sm:text-lg cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor =
                       "rgba(239, 68, 68, 0.3)";
