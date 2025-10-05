@@ -29,34 +29,42 @@ export default function Header() {
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-2">
             <a
               href="/"
-              className="text-white hover:text-primary-400 transition-colors"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
             >
               Trang chủ
             </a>
             <a
-              href="/movies"
-              className="text-white hover:text-primary-400 transition-colors"
+              href="#"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
+              onClick={(e) => {
+                e.preventDefault();
+                const filterSection = document.getElementById("filter-section");
+                if (filterSection) {
+                  filterSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }}
             >
-              Phim mới
+              Tìm kiếm
             </a>
             <a
               href="#"
-              className="text-white hover:text-primary-400 transition-colors"
-            >
-              Phim lẻ
-            </a>
-            <a
-              href="#"
-              className="text-white hover:text-primary-400 transition-colors"
-            >
-              Phim bộ
-            </a>
-            <a
-              href="#"
-              className="text-white hover:text-primary-400 transition-colors"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
+              onClick={(e) => {
+                e.preventDefault();
+                const filterSection = document.getElementById("filter-section");
+                if (filterSection) {
+                  filterSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }}
             >
               Thể loại
             </a>
@@ -74,7 +82,7 @@ export default function Header() {
                     : "text-gray-400 hover:text-white"
                 }`}
               >
-                👩 Phim Girl
+                👩 Girl Love
               </button>
               <button
                 onClick={() => setMode("boy")}
@@ -84,7 +92,7 @@ export default function Header() {
                     : "text-gray-400 hover:text-white"
                 }`}
               >
-                👨 Phim Boy
+                👨 Boy Love
               </button>
             </div>
           </div>
