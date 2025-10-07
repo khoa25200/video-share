@@ -631,7 +631,7 @@ export default function MoviesPage() {
               >
                 ⭐ PHIM NỔI BẬT
                 <span className={`mode-indicator ${mode}`}>
-                  {mode === "girl" ? "👩 Phim Girl" : "👨 Phim Boy"}
+                  {mode === "girl" ? "👩GL" : "👨BL"}
                 </span>
               </h2>
               <p style={{ color: "#9ca3af", fontSize: "1rem" }}>
@@ -1054,7 +1054,7 @@ export default function MoviesPage() {
             >
               🏆 TOP 5 PHIM XEM NHIỀU NHẤT
               <span className={`mode-indicator ${mode}`}>
-                {mode === "girl" ? "👩 Phim Girl" : "👨 Phim Boy"}
+                {mode === "girl" ? "👩GL" : "👨BL"}
               </span>
             </h2>
             {/* Mobile Layout: Top 2 above, 3 below */}
