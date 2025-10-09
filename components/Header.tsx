@@ -18,7 +18,7 @@ export default function Header() {
             className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src="/assets/logo.jpg"
+              src="/assets/logo.png"
               alt="GLVIETSUB Logo"
               className="w-12 h-12 rounded-lg object-cover"
             />
