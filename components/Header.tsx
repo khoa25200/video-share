@@ -20,7 +20,7 @@ export default function Header() {
             <img
               src="/assets/logo.jpg"
               alt="GLVIETSUB Logo"
-              className="w-10 h-10 rounded-lg object-cover"
+              className="w-12 h-12 rounded-lg object-cover"
             />
             <div>
               <h1 className="text-xl font-bold gradient-text">GLVIETSUB</h1>

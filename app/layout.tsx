@@ -4,12 +4,16 @@ import { ModeProvider } from "@/lib/mode-context";
 
 export const metadata: Metadata = {
   title: "GLVIETSUB - Xem Phim Online HD",
-  description: "Xem phim online miễn phí, chất lượng HD với phụ đề Việt",
-  keywords: "phim online, xem phim, phim HD, phụ đề việt",
+  description:
+    "Trang Vietsub phim GL hay nhất hoàn toàn miễn phí, cập nhật nhanh chóng và đầy đủ.",
+  keywords: "phim online, xem phim, phim HD, phụ đề việt, phim GL, vietsub, GLVIETSUB, vietsub phim, phim vietsub, phim vietsub online, phim vietsub HD, phim vietsub hay nhất, phim vietsub miễn phí, phim vietsub cập nhật nhanh chóng và đầy đủ.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: [
+      { url: "/assets/logo.ico", sizes: "any" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    shortcut: "/assets/logo.ico",
+    apple: "/assets/logo.ico",
   },
 };
 
