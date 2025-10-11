@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSheetData, getUniqueTypes } from "@/lib/google-sheets";
+import {
+  getSheetData,
+  getUniqueTypes,
+  getServerConfig,
+  applyServerSwitching,
+} from "@/lib/google-sheets";
 
 // Function to remove Vietnamese diacritics
 function removeVietnameseDiacritics(str: string): string {
@@ -37,6 +42,11 @@ export async function GET(request: NextRequest) {
     try {
       const sheetName = mode === "boy" ? "main_boy" : "main";
       allData = await getSheetData(sheetName);
+
+      // Apply server switching logic
+      const serverConfig = await getServerConfig();
+      allData = applyServerSwitching(allData, serverConfig);
+
       console.log("Movies data fetched - Status: success");
     } catch (error) {
       console.log("Movies data fetch failed - Status: error");

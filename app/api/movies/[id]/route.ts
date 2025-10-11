@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSheetData } from "@/lib/google-sheets";
+import {
+  getSheetData,
+  getServerConfig,
+  applyServerSwitching,
+} from "@/lib/google-sheets";
 
 // GET /api/movies/[id] - Lấy chi tiết movie theo ID
 export async function GET(
@@ -20,7 +24,11 @@ export async function GET(
 
     // Lấy dữ liệu từ Google Sheets
     const sheetName = mode === "boy" ? "main_boy" : "main";
-    const allData = await getSheetData(sheetName);
+    let allData = await getSheetData(sheetName);
+
+    // Apply server switching logic
+    const serverConfig = await getServerConfig();
+    allData = applyServerSwitching(allData, serverConfig);
 
     // Tìm movie theo ID
     const movie = allData.find((item: any) => item.id === id);

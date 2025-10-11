@@ -15,12 +15,60 @@ export interface Movie {
   actors: string;
   description: string;
   iframe: string;
+  iframe2?: string; // Backup iframe for server switching
   thumbnail: string;
   mobileThumbnail?: string; // Mobile banner thumbnail
   videoUrl?: string; // Optional video URL for MP4/M3U8 files
   series?: string; // Series name for grouping
   episode?: string; // Episode number within series
   ranking?: string; // Ranking from 1-5 for top movies
+}
+
+// Function to get server configuration from "server" sheet
+export async function getServerConfig(): Promise<string> {
+  try {
+    const sheets = getGoogleSheetsClient();
+    const spreadsheetId =
+      process.env.GOOGLE_SHEET_ID ||
+      "1pG-9mMCMq2sVi8-ez15zjcmCwqI4LCyecX-cC5uQb7U";
+
+    if (!spreadsheetId) {
+      throw new Error("GOOGLE_SHEET_ID is not defined");
+    }
+
+    // Get server configuration from D3 cell in "server" sheet
+    const range = "server!D3:D3";
+
+    const requestOptions: any = {
+      spreadsheetId,
+      range,
+    };
+
+    // Add API key if available
+    const apiKey =
+      process.env.GOOGLE_API_KEY || "AIzaSyBUH2ZEZrcknbnPMug_OmMAZaNPeFt4_pk";
+    if (apiKey) {
+      requestOptions.key = apiKey;
+    }
+
+    const response = await sheets.spreadsheets.values.get(requestOptions);
+    const rows = response.data.values;
+
+    if (!rows || rows.length === 0 || !rows[0] || !rows[0][0]) {
+      console.warn("Server configuration not found, defaulting to Server1");
+      return "Server1";
+    }
+
+    const serverConfig = rows[0][0].trim();
+    return serverConfig === "Server2" ? "Server2" : "Server1";
+  } catch (error) {
+    console.error("Error fetching server configuration - Status: failed");
+    console.warn(
+      "Server configuration fetch failed, defaulting to Server1:",
+      error
+    );
+    return "Server1";
+  }
 }
 
 // Khởi tạo Google Sheets API client
@@ -67,7 +115,7 @@ export async function getSheetData(sheetName?: string): Promise<Movie[]> {
     // Xác định range để lấy dữ liệu
     const targetSheetName =
       sheetName || process.env.GOOGLE_SHEET_NAME || "main";
-    const range = `${targetSheetName}!A:Q`; // Lấy từ cột A đến Q (17 cột) - bao gồm series, episode và ranking
+    const range = `${targetSheetName}!A:R`; // Lấy từ cột A đến R (18 cột) - bao gồm series, episode, ranking và iframe2
 
     // Lấy dữ liệu từ sheet
     const requestOptions: any = {
@@ -112,6 +160,7 @@ export async function getSheetData(sheetName?: string): Promise<Movie[]> {
           actors: "actors",
           description: "description",
           iframe: "iframe",
+          iframe2: "iframe2",
           thumbnail: "thumbnail",
           mobileThumbnail: "mobileThumbnail",
           videoUrl: "videoUrl",
@@ -122,6 +171,15 @@ export async function getSheetData(sheetName?: string): Promise<Movie[]> {
 
         const key = keyMap[header] || header.toLowerCase().replace(/\s+/g, "");
         movie[key] = row[index] || "";
+
+        // Handle iframe2 with flexible naming
+        if (
+          header.toLowerCase().includes("iframe2") ||
+          header.toLowerCase().includes("backup") ||
+          header.toLowerCase() === "ads"
+        ) {
+          movie.iframe2 = row[index] || "";
+        }
       });
       return movie as Movie;
     });
@@ -150,7 +208,7 @@ export async function getHighlightData(sheetName?: string): Promise<Movie[]> {
 
     // Lấy dữ liệu từ sheet highlight
     const targetSheetName = sheetName || "hight_light";
-    const range = `${targetSheetName}!A:R`; // Updated to include mobileThumbnail column
+    const range = `${targetSheetName}!A:S`; // Updated to include iframe2 column
 
     const requestOptions: any = {
       spreadsheetId,
@@ -194,6 +252,7 @@ export async function getHighlightData(sheetName?: string): Promise<Movie[]> {
           actors: "actors",
           description: "description",
           iframe: "iframe",
+          iframe2: "iframe2",
           thumbnail: "thumbnail",
           mobileThumbnail: "mobileThumbnail",
           videoUrl: "videoUrl",
@@ -204,6 +263,15 @@ export async function getHighlightData(sheetName?: string): Promise<Movie[]> {
 
         const key = keyMap[header] || header.toLowerCase().replace(/\s+/g, "");
         movie[key] = row[index] || "";
+
+        // Handle iframe2 with flexible naming
+        if (
+          header.toLowerCase().includes("iframe2") ||
+          header.toLowerCase().includes("backup") ||
+          header.toLowerCase() === "ads"
+        ) {
+          movie.iframe2 = row[index] || "";
+        }
       });
       return movie as Movie;
     });
@@ -225,8 +293,15 @@ export async function getTopRankingMovies(
   try {
     const allMovies = await getSheetData(sheetName);
 
+    // Apply server switching logic
+    const serverConfig = await getServerConfig();
+    const moviesWithServerSwitching = applyServerSwitching(
+      allMovies,
+      serverConfig
+    );
+
     // Lọc phim có ranking từ 1-5 và sắp xếp theo ranking
-    const topMovies = allMovies
+    const topMovies = moviesWithServerSwitching
       .filter((movie) => {
         const ranking = parseInt(movie.ranking || "0");
         return ranking >= 1 && ranking <= 5;
@@ -398,4 +473,26 @@ export async function getUniqueYears(sheetName?: string): Promise<string[]> {
     console.error("Error fetching unique years - Status: failed");
     throw error;
   }
+}
+
+// Function to apply server switching logic to movie data
+export function applyServerSwitching(
+  movies: Movie[],
+  serverConfig: string
+): Movie[] {
+  return movies.map((movie) => {
+    if (
+      serverConfig === "Server2" &&
+      movie.iframe2 &&
+      movie.iframe2.trim() !== ""
+    ) {
+      // Use iframe2 when server is Server2
+      return {
+        ...movie,
+        iframe: movie.iframe2,
+      };
+    }
+    // Use original iframe when server is Server1 or iframe2 is not available
+    return movie;
+  });
 }

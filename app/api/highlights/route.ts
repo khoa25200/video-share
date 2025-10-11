@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getHighlightData } from "@/lib/google-sheets";
+import {
+  getHighlightData,
+  getServerConfig,
+  applyServerSwitching,
+} from "@/lib/google-sheets";
 
 // GET /api/highlights - Lấy danh sách phim nổi bật
 export async function GET(request: NextRequest) {
@@ -12,6 +16,11 @@ export async function GET(request: NextRequest) {
     try {
       const sheetName = mode === "boy" ? "hight_light_boy" : "hight_light";
       allData = await getHighlightData(sheetName);
+
+      // Apply server switching logic
+      const serverConfig = await getServerConfig();
+      allData = applyServerSwitching(allData, serverConfig);
+
       console.log("Highlights data fetched - Status: success");
     } catch (error) {
       console.log("Highlights data fetch failed - Status: error");
