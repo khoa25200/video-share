@@ -15,17 +15,13 @@ export default function Header() {
           {/* Logo */}
           <a
             href="/"
-            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+            className="flex items-center hover:opacity-80 transition-opacity"
           >
             <img
-              src="/assets/logo.png"
+              src="/assets/logo.jpg"
               alt="GLVIETSUB Logo"
-              className="w-12 h-12 rounded-lg object-cover"
+              className="h-12 w-auto object-contain"
             />
-            <div>
-              <h1 className="text-xl font-bold gradient-text">GLVIETSUB</h1>
-              <p className="text-xs text-gray-400">Xem phim online HD</p>
-            </div>
           </a>
 
           {/* Desktop Navigation */}
