@@ -64,6 +64,12 @@ export default function Header() {
             >
               Thể loại
             </a>
+            <button
+              onClick={() => setMode(mode === "boy" ? "girl" : "boy")}
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
+            >
+              {mode === "boy" ? "👩 Girl Love" : "👨 Boy Love"}
+            </button>
           </nav>
 
           {/* Desktop Mode Toggle */}
@@ -170,6 +176,15 @@ export default function Header() {
                 >
                   Thể loại
                 </a>
+                <button
+                  onClick={() => {
+                    setMode(mode === "boy" ? "girl" : "boy");
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left text-white hover:text-primary-400 transition-colors py-2"
+                >
+                  {mode === "boy" ? "👩 Girl Love" : "👨 Boy Love"}
+                </button>
               </nav>
             </div>
           </div>
