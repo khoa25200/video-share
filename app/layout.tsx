@@ -42,6 +42,12 @@ export default function RootLayout({
           src="https://a.magsrv.com/ad-provider.js"
           strategy="beforeInteractive"
         />
+        <Script
+          async
+          type="application/javascript"
+          src="https://a.pemsrv.com/ad-provider.js"
+          strategy="beforeInteractive"
+        />
         <ins
           className="eas6a97888e6"
           data-zoneid="5766480"
@@ -57,6 +63,18 @@ export default function RootLayout({
         <ins
           className="eas6a97888e17"
           data-zoneid="5766486"
+          data-block-ad-types="0"
+          data-ex_av="name"
+        />
+        <ins
+          className="eas6a97888e14"
+          data-zoneid="5766490"
+          data-block-ad-types="0"
+          data-ex_av="name"
+        />
+        <ins
+          className="eas6a97888e33"
+          data-zoneid="5766492"
           data-block-ad-types="0"
           data-ex_av="name"
         />
