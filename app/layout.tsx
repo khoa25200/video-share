@@ -48,30 +48,10 @@ export default function RootLayout({
           src="https://a.pemsrv.com/ad-provider.js"
           strategy="beforeInteractive"
         />
-        <ins
-          className="eas6a97888e6"
-          data-zoneid="5766480"
-          data-block-ad-types="0"
-          data-ex_av="name"
-        />
-        <ins
-          className="eas6a97888e17"
-          data-zoneid="5766482"
-          data-block-ad-types="0"
-          data-ex_av="name"
-        />
-        <ins
-          className="eas6a97888e17"
-          data-zoneid="5766486"
-          data-block-ad-types="0"
-          data-ex_av="name"
-        />
-        <ins
-          className="eas6a97888e14"
-          data-zoneid="5766490"
-          data-block-ad-types="0"
-          data-ex_av="name"
-        />
+        <ins className="eas6a97888e6" data-zoneid="5766480" />
+        <ins className="eas6a97888e17" data-zoneid="5766482" />
+        <ins className="eas6a97888e17" data-zoneid="5766486" />
+        <ins className="eas6a97888e14" data-zoneid="5766490" />
         <ins
           className="eas6a97888e33"
           data-zoneid="5766492"
