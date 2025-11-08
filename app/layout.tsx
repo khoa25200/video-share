@@ -52,12 +52,7 @@ export default function RootLayout({
         <ins className="eas6a97888e17" data-zoneid="5766482" />
         <ins className="eas6a97888e17" data-zoneid="5766486" />
         <ins className="eas6a97888e14" data-zoneid="5766490" />
-        <ins
-          className="eas6a97888e33"
-          data-zoneid="5766492"
-          data-block-ad-types="0"
-          data-ex_av="name"
-        />
+        <ins className="eas6a97888e33" data-zoneid="5766492" />
         <Script id="ad-provider-init" strategy="afterInteractive">
           {`(AdProvider = window.AdProvider || []).push({"serve": {}});`}
         </Script>
