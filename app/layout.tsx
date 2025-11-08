@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { ModeProvider } from "@/lib/mode-context";
+import VideoProtection from "@/components/VideoProtection";
 
 export const metadata: Metadata = {
   title: "GLVIETSUB - Xem Phim Online HD",
@@ -56,6 +57,7 @@ export default function RootLayout({
         <Script id="ad-provider-init" strategy="afterInteractive">
           {`(AdProvider = window.AdProvider || []).push({"serve": {}});`}
         </Script>
+        <VideoProtection />
         <ModeProvider>{children}</ModeProvider>
       </body>
     </html>

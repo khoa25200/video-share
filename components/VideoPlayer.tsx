@@ -22,6 +22,7 @@ export default function VideoPlayer({
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Kiểm tra loại video
   const isVideoFile =
@@ -61,10 +62,126 @@ export default function VideoPlayer({
     }
   }, [isVideoFile]);
 
+  // Bảo vệ chống download video
+  useEffect(() => {
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container) return;
+
+    // Disable right-click context menu
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Disable keyboard shortcuts
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Block Ctrl+S, Ctrl+U, Ctrl+Shift+I, F12, Ctrl+Shift+J, Ctrl+Shift+C
+      if (
+        (e.ctrlKey && e.key === "s") ||
+        (e.ctrlKey && e.key === "u") ||
+        (e.ctrlKey &&
+          e.shiftKey &&
+          (e.key === "I" || e.key === "J" || e.key === "C")) ||
+        e.key === "F12" ||
+        (e.ctrlKey && e.shiftKey && e.key === "K")
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    // Disable drag and drop
+    const handleDragStart = (e: DragEvent) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Disable text selection
+    const handleSelectStart = (e: Event) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Disable video download via video element
+    const handleVideoContextMenu = (e: Event) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Prevent video source inspection
+    const handleVideoLoadStart = () => {
+      if (video.src) {
+        // Obfuscate video URL in DOM
+        Object.defineProperty(video, "src", {
+          get: () => "",
+          set: () => {},
+          configurable: true,
+        });
+      }
+    };
+
+    // Add event listeners
+    container.addEventListener("contextmenu", handleContextMenu);
+    document.addEventListener("keydown", handleKeyDown);
+    container.addEventListener("dragstart", handleDragStart);
+    container.addEventListener("selectstart", handleSelectStart);
+    video.addEventListener("contextmenu", handleVideoContextMenu);
+    video.addEventListener("loadstart", handleVideoLoadStart);
+
+    // Disable video controls download button
+    if (video.hasAttribute("controls")) {
+      video.setAttribute("controlsList", "nodownload noplaybackrate");
+    }
+
+    // Add CSS to disable pointer events on video controls
+    const style = document.createElement("style");
+    style.textContent = `
+      video::-webkit-media-controls-enclosure {
+        pointer-events: none !important;
+      }
+      video::-webkit-media-controls-panel {
+        pointer-events: none !important;
+      }
+      video::-webkit-media-controls-play-button {
+        pointer-events: auto !important;
+      }
+      video::-webkit-media-controls-timeline {
+        pointer-events: auto !important;
+      }
+      video::-webkit-media-controls-volume-slider {
+        pointer-events: auto !important;
+      }
+      video::-webkit-media-controls-mute-button {
+        pointer-events: auto !important;
+      }
+      video::-webkit-media-controls-fullscreen-button {
+        pointer-events: auto !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      container.removeEventListener("contextmenu", handleContextMenu);
+      document.removeEventListener("keydown", handleKeyDown);
+      container.removeEventListener("dragstart", handleDragStart);
+      container.removeEventListener("selectstart", handleSelectStart);
+      video.removeEventListener("contextmenu", handleVideoContextMenu);
+      video.removeEventListener("loadstart", handleVideoLoadStart);
+      document.head.removeChild(style);
+    };
+  }, [isVideoFile]);
+
   return (
     <div className={`relative w-full ${className}`}>
       {/* Container với tỷ lệ 16:9 */}
-      <div className="relative w-full aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+      <div
+        ref={containerRef}
+        className="relative w-full aspect-video bg-black rounded-lg overflow-hidden shadow-2xl"
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        style={{ userSelect: "none", WebkitUserSelect: "none" }}
+      >
         {/* Skeleton Loader */}
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-800 animate-pulse">
@@ -77,28 +194,50 @@ export default function VideoPlayer({
 
         {/* Video Player cho MP4/M3U8 */}
         {isVideoFile ? (
-          <video
-            ref={videoRef}
-            className={`w-full h-full object-contain transition-opacity duration-500 ${
-              isLoading ? "opacity-0" : "opacity-100"
-            }`}
-            controls
-            preload="metadata"
-            onLoadedData={handleVideoLoad}
-            onError={handleVideoError}
-            poster={movie.thumbnail || undefined}
-          >
-            <source
-              src={movie.videoUrl}
-              type={
-                movie.videoUrl?.endsWith(".m3u8")
-                  ? "application/x-mpegURL"
-                  : "video/mp4"
-              }
+          <>
+            <video
+              ref={videoRef}
+              className={`w-full h-full object-contain transition-opacity duration-500 ${
+                isLoading ? "opacity-0" : "opacity-100"
+              }`}
+              controls
+              controlsList="nodownload noplaybackrate"
+              preload="metadata"
+              onLoadedData={handleVideoLoad}
+              onError={handleVideoError}
+              poster={movie.thumbnail || undefined}
+              onContextMenu={(e) => e.preventDefault()}
+              style={{ pointerEvents: "auto" }}
+              disablePictureInPicture
+              disableRemotePlayback
+            >
+              <source
+                src={movie.videoUrl}
+                type={
+                  movie.videoUrl?.endsWith(".m3u8")
+                    ? "application/x-mpegURL"
+                    : "video/mp4"
+                }
+              />
+              <track kind="subtitles" srcLang="vi" label="Vietnamese" />
+              Trình duyệt không hỗ trợ video.
+            </video>
+            {/* Watermark overlay */}
+            <div className="absolute top-4 right-4 pointer-events-none z-10">
+              <div className="bg-black/50 backdrop-blur-sm px-3 py-1 rounded text-white text-sm font-semibold">
+                GLVIETSUB.ORG
+              </div>
+            </div>
+            {/* Protection overlay - prevents direct access to video element */}
+            <div
+              className="absolute inset-0 pointer-events-none z-20"
+              style={{
+                background: "transparent",
+                userSelect: "none",
+                WebkitUserSelect: "none",
+              }}
             />
-            <track kind="subtitles" srcLang="vi" label="Vietnamese" />
-            Trình duyệt không hỗ trợ video.
-          </video>
+          </>
         ) : (
           /* Iframe Player */
           <iframe
