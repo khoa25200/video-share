@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import { ModeProvider } from "@/lib/mode-context";
 
@@ -28,7 +29,27 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi">
+      <head>
+        <meta
+          httpEquiv="Delegate-CH"
+          content="Sec-CH-UA https://s.magsrv.com; Sec-CH-UA-Mobile https://s.magsrv.com; Sec-CH-UA-Arch https://s.magsrv.com; Sec-CH-UA-Model https://s.magsrv.com; Sec-CH-UA-Platform https://s.magsrv.com; Sec-CH-UA-Platform-Version https://s.magsrv.com; Sec-CH-UA-Bitness https://s.magsrv.com; Sec-CH-UA-Full-Version-List https://s.magsrv.com; Sec-CH-UA-Full-Version https://s.magsrv.com;"
+        />
+      </head>
       <body className="bg-dark-900 text-white min-h-screen">
+        <Script
+          async
+          type="application/javascript"
+          src="https://a.magsrv.com/ad-provider.js"
+          strategy="beforeInteractive"
+        />
+        <ins
+          className="eas6a97888e6"
+          data-zoneid="5766480"
+          data-keywords="keywords"
+        />
+        <Script id="ad-provider-init" strategy="afterInteractive">
+          {`(AdProvider = window.AdProvider || []).push({"serve": {}});`}
+        </Script>
         <ModeProvider>{children}</ModeProvider>
       </body>
     </html>
