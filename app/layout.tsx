@@ -45,12 +45,14 @@ export default function RootLayout({
         <ins
           className="eas6a97888e6"
           data-zoneid="5766480"
-          data-keywords="keywords"
+          data-block-ad-types="0"
+          data-ex_av="name"
         />
         <ins
           className="eas6a97888e17"
           data-zoneid="5766482"
-          data-keywords="keywords"
+          data-block-ad-types="0"
+          data-ex_av="name"
         />
         <Script id="ad-provider-init" strategy="afterInteractive">
           {`(AdProvider = window.AdProvider || []).push({"serve": {}});`}
