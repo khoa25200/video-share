@@ -50,10 +50,10 @@ export default function RootLayout({
           strategy="beforeInteractive"
         />
         <ins className="eas6a97888e6" data-zoneid="5766480" />
-        <ins className="eas6a97888e17" data-zoneid="5766482" />
-        <ins className="eas6a97888e17" data-zoneid="5766486" />
+        {/* <ins className="eas6a97888e17" data-zoneid="5766482" /> */}
+        {/* <ins className="eas6a97888e17" data-zoneid="5766486" /> */}
         <ins className="eas6a97888e14" data-zoneid="5766490" />
-        <ins className="eas6a97888e33" data-zoneid="5766492" />
+        {/* <ins className="eas6a97888e33" data-zoneid="5766492" /> */}
         <Script id="ad-provider-init" strategy="afterInteractive">
           {`(AdProvider = window.AdProvider || []).push({"serve": {}});`}
         </Script>
