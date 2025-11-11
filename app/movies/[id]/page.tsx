@@ -144,7 +144,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             <div className="flex items-center space-x-4">
               <a
                 href="/movies"
-                className="flex items-center space-x-2 text-white hover:text-primary-400 transition-colors"
+                className="ads-glvietsub flex items-center space-x-2 text-white hover:text-primary-400 transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -423,7 +423,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                       videoSection.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
-                  className="flex items-center space-x-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="ads-glvietsub flex items-center space-x-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <svg
                     className="w-6 h-6"
@@ -462,6 +462,11 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           <VideoPlayer movie={movie} />
         </div>
 
+        {/* Banner Ad - After Video Player */}
+        <div className="w-full bg-dark-800 py-4 flex justify-center my-8">
+          <ins className="eas6a97888e31" data-zoneid="5768076" />
+        </div>
+
         {/* Related Episodes Section */}
         {relatedEpisodes.length > 0 && (
           <div className="mt-12">
@@ -492,6 +497,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                   onClick={() => {
                     window.location.href = `/movies/${episode.id}`;
                   }}
+                  className="ads-glvietsub"
                 >
                   {/* Episode Thumbnail */}
                   <div

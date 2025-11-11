@@ -611,6 +611,11 @@ export default function MoviesPage() {
       {/* Header */}
       <Header />
 
+      {/* Banner Ad - After Header */}
+      <div className="w-full bg-dark-800 py-2 flex justify-center">
+        <ins className="eas6a97888e31" data-zoneid="5768076" />
+      </div>
+
       {/* Highlights Section */}
       {!highlightsLoading && highlights.length > 0 && (
         <section style={{ padding: "2rem 0", backgroundColor: "#0f172a" }}>
@@ -1033,6 +1038,11 @@ export default function MoviesPage() {
         </section>
       )}
 
+      {/* Banner Ad - Between Sections */}
+      <div className="w-full bg-dark-800 py-4 flex justify-center">
+        <ins className="eas6a97888e31" data-zoneid="5768076" />
+      </div>
+
       {/* Top Ranking Section */}
       {!rankingLoading && topRanking.length > 0 && (
         <section style={{ padding: "2rem 0", backgroundColor: "#1e293b" }}>
@@ -1086,6 +1096,7 @@ export default function MoviesPage() {
                     onClick={() =>
                       (window.location.href = `/movies/${movie.id}`)
                     }
+                    className="ads-glvietsub"
                   >
                     {/* Ranking Badge */}
                     <div
@@ -1223,6 +1234,7 @@ export default function MoviesPage() {
                     onClick={() =>
                       (window.location.href = `/movies/${movie.id}`)
                     }
+                    className="ads-glvietsub"
                   >
                     {/* Ranking Badge */}
                     <div
@@ -1366,6 +1378,7 @@ export default function MoviesPage() {
                       "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
                   }}
                   onClick={() => (window.location.href = `/movies/${movie.id}`)}
+                  className="ads-glvietsub"
                 >
                   {/* Ranking Badge */}
                   <div
@@ -1787,6 +1800,7 @@ export default function MoviesPage() {
               {/* Search Button */}
               <button
                 onClick={applyFilters}
+                className="ads-glvietsub bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                 style={{
                   backgroundColor: "rgba(34, 197, 94, 0.2)",
                   color: "#22c55e",
@@ -1801,7 +1815,6 @@ export default function MoviesPage() {
                   alignItems: "center",
                   gap: "0.25rem",
                 }}
-                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor =
                     "rgba(34, 197, 94, 0.3)";
@@ -1916,6 +1929,7 @@ export default function MoviesPage() {
                       "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
                   }}
                   onClick={() => handlePlay(movie)}
+                  className="ads-glvietsub"
                 >
                   {/* Movie Poster */}
                   <div
@@ -2142,6 +2156,7 @@ export default function MoviesPage() {
                             e.currentTarget.style.borderColor = "#374151";
                           }}
                           onClick={() => handlePlay(movie)}
+                          className="ads-glvietsub"
                         >
                           {/* Episode Thumbnail */}
                           <div
@@ -2230,6 +2245,11 @@ export default function MoviesPage() {
               )}
             </div>
           )}
+
+          {/* Banner Ad - Before Pagination */}
+          <div className="w-full bg-dark-800 py-4 flex justify-center my-8">
+            <ins className="eas6a97888e31" data-zoneid="5768076" />
+          </div>
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
