@@ -38,4 +38,3 @@ window.document.querySelectorAll||(document.querySelectorAll=document.body.query
 
   return null;
 }
-
