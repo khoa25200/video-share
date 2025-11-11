@@ -485,7 +485,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
               {relatedEpisodes.map((episode) => (
                 <div
                   key={episode.id}
-                  className={`bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer max-w-[250px] w-full mx-auto ${
+                  className={`ads-glvietsub bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer max-w-[250px] w-full mx-auto ${
                     episode.id === movie.id
                       ? "border-primary-500 ring-2 ring-primary-500/20"
                       : "border-dark-700 hover:border-primary-500/50"
@@ -497,7 +497,6 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                   onClick={() => {
                     window.location.href = `/movies/${episode.id}`;
                   }}
-                  className="ads-glvietsub"
                 >
                   {/* Episode Thumbnail */}
                   <div
