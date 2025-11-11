@@ -1917,7 +1917,7 @@ export default function MoviesPage() {
               {movies?.data.map((movie) => (
                 <div
                   key={movie.id}
-                  className={`${styles.movieCard} bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto`}
+                  className={`ads-glvietsub ${styles.movieCard} bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto`}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "scale(1.05)";
                     e.currentTarget.style.boxShadow =
@@ -1929,7 +1929,6 @@ export default function MoviesPage() {
                       "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
                   }}
                   onClick={() => handlePlay(movie)}
-                  className="ads-glvietsub"
                 >
                   {/* Movie Poster */}
                   <div
