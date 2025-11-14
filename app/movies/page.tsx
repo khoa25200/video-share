@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { sendTelegramNotification, getUserIP } from "@/lib/telegram";
 import { useMode } from "@/lib/mode-context";
 import Header from "@/components/Header";
+import AdPlaceholder from "@/components/AdPlaceholder";
 import styles from "@/styles/movie-grid.module.css";
 
 interface Movie {
@@ -611,9 +612,11 @@ export default function MoviesPage() {
       {/* Header */}
       <Header />
 
-      {/* Banner Ad - After Header */}
-      <div className="w-full bg-dark-800 py-2 flex justify-center">
-        <ins className="eas6a97888e31" data-zoneid="5768076" />
+      {/* Ad Placeholder - After Header */}
+      <div className="w-full bg-dark-900 py-2 px-4">
+        <div className="max-w-7xl mx-auto">
+          <AdPlaceholder height="h-20 sm:h-24" label="Banner Quảng Cáo" />
+        </div>
       </div>
 
       {/* Highlights Section */}
@@ -1038,9 +1041,11 @@ export default function MoviesPage() {
         </section>
       )}
 
-      {/* Banner Ad - Between Sections */}
-      <div className="w-full bg-dark-800 py-4 flex justify-center">
-        <ins className="eas6a97888e31" data-zoneid="5768076" />
+      {/* Ad Placeholder - Between Sections */}
+      <div className="w-full bg-dark-900 py-4 px-4">
+        <div className="max-w-7xl mx-auto">
+          <AdPlaceholder height="h-24 sm:h-32" label="Banner Quảng Cáo" />
+        </div>
       </div>
 
       {/* Top Ranking Section */}
@@ -1096,7 +1101,6 @@ export default function MoviesPage() {
                     onClick={() =>
                       (window.location.href = `/movies/${movie.id}`)
                     }
-                    className="ads-glvietsub"
                   >
                     {/* Ranking Badge */}
                     <div
@@ -1234,7 +1238,6 @@ export default function MoviesPage() {
                     onClick={() =>
                       (window.location.href = `/movies/${movie.id}`)
                     }
-                    className="ads-glvietsub"
                   >
                     {/* Ranking Badge */}
                     <div
@@ -1378,7 +1381,6 @@ export default function MoviesPage() {
                       "0 4px 6px -1px rgba(0, 0, 0, 0.1)";
                   }}
                   onClick={() => (window.location.href = `/movies/${movie.id}`)}
-                  className="ads-glvietsub"
                 >
                   {/* Ranking Badge */}
                   <div
@@ -1800,7 +1802,7 @@ export default function MoviesPage() {
               {/* Search Button */}
               <button
                 onClick={applyFilters}
-                className="ads-glvietsub bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
+                className="bg-green-500/20 text-green-400 border border-green-500/30 rounded-full px-2 py-2 sm:px-10 sm:py-5 text-sm sm:text-xl cursor-pointer font-medium transition-all duration-300 flex items-center gap-0.5 sm:gap-3"
                 style={{
                   backgroundColor: "rgba(34, 197, 94, 0.2)",
                   color: "#22c55e",
@@ -1917,7 +1919,7 @@ export default function MoviesPage() {
               {movies?.data.map((movie) => (
                 <div
                   key={movie.id}
-                  className={`ads-glvietsub ${styles.movieCard} bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto`}
+                  className={`${styles.movieCard} bg-gray-800 rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:scale-105 hover:shadow-xl max-w-[150px] w-full mx-auto`}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "scale(1.05)";
                     e.currentTarget.style.boxShadow =
@@ -2155,7 +2157,6 @@ export default function MoviesPage() {
                             e.currentTarget.style.borderColor = "#374151";
                           }}
                           onClick={() => handlePlay(movie)}
-                          className="ads-glvietsub"
                         >
                           {/* Episode Thumbnail */}
                           <div
@@ -2245,9 +2246,9 @@ export default function MoviesPage() {
             </div>
           )}
 
-          {/* Banner Ad - Before Pagination */}
-          <div className="w-full bg-dark-800 py-4 flex justify-center my-8">
-            <ins className="eas6a97888e31" data-zoneid="5768076" />
+          {/* Ad Placeholder - Before Pagination */}
+          <div className="w-full py-4">
+            <AdPlaceholder height="h-24 sm:h-32" label="Banner Quảng Cáo" />
           </div>
 
           {/* Pagination Controls */}

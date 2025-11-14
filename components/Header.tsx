@@ -28,13 +28,13 @@ export default function Header() {
           <nav className="hidden md:flex items-center space-x-2">
             <a
               href="/"
-              className="ads-glvietsub px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
             >
               Trang chủ
             </a>
             <a
               href="#"
-              className="ads-glvietsub px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
               onClick={(e) => {
                 e.preventDefault();
                 const filterSection = document.getElementById("filter-section");
@@ -50,7 +50,7 @@ export default function Header() {
             </a>
             <a
               href="#"
-              className="ads-glvietsub px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
+              className="px-3 py-2 rounded-md text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-700 transition-all duration-200"
               onClick={(e) => {
                 e.preventDefault();
                 const filterSection = document.getElementById("filter-section");
@@ -148,31 +148,31 @@ export default function Header() {
               <nav className="space-y-2">
                 <a
                   href="/"
-                  className="ads-glvietsub block text-white hover:text-primary-400 transition-colors py-2"
+                  className="block text-white hover:text-primary-400 transition-colors py-2"
                 >
                   Trang chủ
                 </a>
                 <a
                   href="/movies"
-                  className="ads-glvietsub block text-white hover:text-primary-400 transition-colors py-2"
+                  className="block text-white hover:text-primary-400 transition-colors py-2"
                 >
                   Phim mới
                 </a>
                 <a
                   href="#"
-                  className="ads-glvietsub block text-white hover:text-primary-400 transition-colors py-2"
+                  className="block text-white hover:text-primary-400 transition-colors py-2"
                 >
                   Phim lẻ
                 </a>
                 <a
                   href="#"
-                  className="ads-glvietsub block text-white hover:text-primary-400 transition-colors py-2"
+                  className="block text-white hover:text-primary-400 transition-colors py-2"
                 >
                   Phim bộ
                 </a>
                 <a
                   href="#"
-                  className="ads-glvietsub block text-white hover:text-primary-400 transition-colors py-2"
+                  className="block text-white hover:text-primary-400 transition-colors py-2"
                 >
                   Thể loại
                 </a>

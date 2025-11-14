@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Movie } from "@/lib/google-sheets";
 import VideoPlayer from "@/components/VideoPlayer";
+import AdPlaceholder from "@/components/AdPlaceholder";
 import { useMode } from "@/lib/mode-context";
 
 interface MovieDetailProps {
@@ -144,7 +145,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             <div className="flex items-center space-x-4">
               <a
                 href="/movies"
-                className="ads-glvietsub flex items-center space-x-2 text-white hover:text-primary-400 transition-colors"
+                className="flex items-center space-x-2 text-white hover:text-primary-400 transition-colors"
               >
                 <svg
                   className="w-6 h-6"
@@ -170,7 +171,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Movie Poster */}
           <div className="lg:col-span-1">
             <div
@@ -423,7 +424,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                       videoSection.scrollIntoView({ behavior: "smooth" });
                     }
                   }}
-                  className="ads-glvietsub flex items-center space-x-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="flex items-center space-x-3 bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
                   <svg
                     className="w-6 h-6"
@@ -454,6 +455,14 @@ export default function MovieDetail({ params }: MovieDetailProps) {
               </div>
             </div>
           </div>
+
+          {/* Ad Sidebar - Desktop Only */}
+          <div className="hidden lg:block lg:col-span-1">
+            <div className="sticky top-24 space-y-4">
+              <AdPlaceholder height="h-64" label="Sidebar Quảng Cáo" />
+              <AdPlaceholder height="h-96" label="Sidebar Quảng Cáo" />
+            </div>
+          </div>
         </div>
 
         {/* Video Player Section */}
@@ -462,9 +471,9 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           <VideoPlayer movie={movie} />
         </div>
 
-        {/* Banner Ad - After Video Player */}
-        <div className="w-full bg-dark-800 py-4 flex justify-center my-8">
-          <ins className="eas6a97888e31" data-zoneid="5768076" />
+        {/* Ad Placeholder - After Video Player */}
+        <div className="mt-8">
+          <AdPlaceholder height="h-24 sm:h-32" label="Banner Quảng Cáo" />
         </div>
 
         {/* Related Episodes Section */}
@@ -473,27 +482,15 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             <h2 className="text-2xl font-bold text-white mb-6">
               📺 {movie.series} - Tất cả tập ({totalEpisodes} tập)
             </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(180px, 250px))",
-                gap: "1rem",
-                justifyContent: "center",
-              }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 justify-center"
-            >
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4 justify-center">
               {relatedEpisodes.map((episode) => (
                 <div
                   key={episode.id}
-                  className={`ads-glvietsub bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer max-w-[250px] w-full mx-auto ${
+                  className={`bg-dark-800 rounded-lg overflow-hidden border-2 transition-all duration-300 cursor-pointer w-full ${
                     episode.id === movie.id
                       ? "border-primary-500 ring-2 ring-primary-500/20"
                       : "border-dark-700 hover:border-primary-500/50"
                   }`}
-                  style={{
-                    maxWidth: "250px",
-                    width: "100%",
-                  }}
                   onClick={() => {
                     window.location.href = `/movies/${episode.id}`;
                   }}
@@ -508,22 +505,22 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                     }}
                   >
                     {/* Episode Badge */}
-                    <div className="absolute top-1 sm:top-2 left-1 sm:left-2 bg-primary-600 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-xs font-bold">
+                    <div className="absolute top-0.5 left-0.5 sm:top-1 sm:left-1 bg-primary-600 text-white px-1 py-0.5 sm:px-1.5 sm:py-1 rounded text-[10px] sm:text-xs font-bold">
                       Tập {episode.episode}
                     </div>
 
                     {/* Current Episode Indicator */}
                     {episode.id === movie.id && (
-                      <div className="absolute top-1 sm:top-2 right-1 sm:right-2 bg-green-600 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-xs font-bold">
+                      <div className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 bg-green-600 text-white px-1 py-0.5 sm:px-1.5 sm:py-1 rounded text-[10px] sm:text-xs font-bold">
                         Đang xem
                       </div>
                     )}
 
                     {/* Play Overlay */}
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-8 h-8 sm:w-12 sm:h-12 bg-primary-600 rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-12 md:h-12 bg-primary-600 rounded-full flex items-center justify-center">
                         <svg
-                          className="w-4 h-4 sm:w-6 sm:h-6 text-white ml-0.5"
+                          className="w-3 h-3 sm:w-4 sm:h-4 md:w-6 md:h-6 text-white ml-0.5"
                           fill="currentColor"
                           viewBox="0 0 24 24"
                         >
@@ -534,14 +531,14 @@ export default function MovieDetail({ params }: MovieDetailProps) {
                   </div>
 
                   {/* Episode Info */}
-                  <div className="p-2 sm:p-3">
-                    <h3 className="text-white text-xs sm:text-sm font-medium line-clamp-2 mb-1">
+                  <div className="p-1 sm:p-2 md:p-3">
+                    <h3 className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-medium line-clamp-2 mb-0.5 sm:mb-1">
                       {episode.title}
                     </h3>
-                    <div className="flex items-center justify-between text-xs text-gray-400">
-                      <span>{episode.duration}</span>
+                    <div className="flex items-center justify-between text-[9px] sm:text-xs text-gray-400">
+                      <span className="truncate">{episode.duration}</span>
                       <span
-                        className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded text-xs ${
+                        className={`px-1 py-0.5 sm:px-1.5 sm:py-0.5 md:px-2 md:py-1 rounded text-[9px] sm:text-xs ${
                           episode.status === "END"
                             ? "bg-green-600/20 text-green-400"
                             : "bg-yellow-600/20 text-yellow-400"
