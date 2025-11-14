@@ -41,7 +41,7 @@ export default function VideoProtection() {
     // Disable text selection on video elements
     const handleSelectStart = (e: Event) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === "VIDEO" || target.closest("video")) {
+      if (target.tagName === "VIDEO" || (target as Element).closest?.("video")) {
         e.preventDefault();
         return false;
       }
@@ -50,7 +50,7 @@ export default function VideoProtection() {
     // Disable drag and drop
     const handleDragStart = (e: DragEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName === "VIDEO" || target.closest("video")) {
+      if (target.tagName === "VIDEO" || (target as Element).closest?.("video")) {
         e.preventDefault();
         return false;
       }

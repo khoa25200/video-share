@@ -456,13 +456,12 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             </div>
           </div>
 
-          {/* Ad Sidebar - Desktop Only */}
-          <div className="hidden lg:block lg:col-span-1">
+          {/* Ad Sidebar - Desktop Only - DISABLED */}
+          {/* <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 space-y-4">
               <AdBanner zoneId="detail-sidebar-top" height="h-64" />
-              <AdBanner zoneId="detail-sidebar-bottom" height="h-96" />
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Video Player Section */}
@@ -471,10 +470,10 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           <VideoPlayer movie={movie} />
         </div>
 
-        {/* Ad Banner - After Video Player */}
-        <div className="mt-8">
+        {/* Ad Banner - After Video Player - DISABLED */}
+        {/* <div className="mt-8">
           <AdBanner zoneId="detail-after-video" height="h-24 sm:h-32" />
-        </div>
+        </div> */}
 
         {/* Related Episodes Section */}
         {relatedEpisodes.length > 0 && (
@@ -532,7 +531,7 @@ export default function MovieDetail({ params }: MovieDetailProps) {
 
                   {/* Episode Info */}
                   <div className="p-1 sm:p-2 md:p-3">
-                    <h3 className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-medium line-clamp-2 mb-0.5 sm:mb-1">
+                    <h3 className="text-white text-xs sm:text-sm md:text-base font-medium line-clamp-2 mb-0.5 sm:mb-1">
                       {episode.title}
                     </h3>
                     <div className="flex items-center justify-between text-[9px] sm:text-xs text-gray-400">

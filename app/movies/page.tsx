@@ -612,12 +612,12 @@ export default function MoviesPage() {
       {/* Header */}
       <Header />
 
-      {/* Ad Banner - After Header */}
-      <div className="w-full bg-dark-900 py-2 px-4">
+      {/* Ad Banner - After Header - DISABLED */}
+      {/* <div className="w-full bg-dark-900 py-2 px-4">
         <div className="max-w-7xl mx-auto">
           <AdBanner zoneId="movies-header" height="h-20 sm:h-24" />
         </div>
-      </div>
+      </div> */}
 
       {/* Highlights Section */}
       {!highlightsLoading && highlights.length > 0 && (
@@ -1041,12 +1041,12 @@ export default function MoviesPage() {
         </section>
       )}
 
-      {/* Ad Banner - Between Sections */}
-      <div className="w-full bg-dark-900 py-4 px-4">
+      {/* Ad Banner - Between Sections - DISABLED */}
+      {/* <div className="w-full bg-dark-900 py-4 px-4">
         <div className="max-w-7xl mx-auto">
           <AdBanner zoneId="movies-between-sections" height="h-24 sm:h-32" />
         </div>
-      </div>
+      </div> */}
 
       {/* Top Ranking Section */}
       {!rankingLoading && topRanking.length > 0 && (
@@ -2246,10 +2246,10 @@ export default function MoviesPage() {
             </div>
           )}
 
-          {/* Ad Banner - Before Pagination */}
-          <div className="w-full py-4">
+          {/* Ad Banner - Before Pagination - DISABLED */}
+          {/* <div className="w-full py-4">
             <AdBanner zoneId="movies-before-pagination" height="h-24 sm:h-32" />
-          </div>
+          </div> */}
 
           {/* Pagination Controls */}
           {totalPages > 1 && (

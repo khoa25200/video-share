@@ -7,20 +7,64 @@ interface AdBannerProps {
   zoneId: string;
   className?: string;
   height?: string;
+  lazyLoad?: boolean; // Lazy load khi scroll đến
+  delay?: number; // Delay trước khi load (ms)
 }
 
 export default function AdBanner({
   zoneId,
   className = "",
   height = "h-24",
+  lazyLoad,
+  delay,
 }: AdBannerProps) {
+  const zone = getAdZone(zoneId);
+  const lazyLoadEnabled = lazyLoad !== undefined ? lazyLoad : (zone?.lazyLoad ?? true);
+  const delayTime = delay !== undefined ? delay : (zone?.delay ?? 2000);
   const adRef = useRef<HTMLDivElement>(null);
   const placeholderRef = useRef<HTMLDivElement>(null);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
+  const [shouldLoad, setShouldLoad] = useState(!lazyLoadEnabled);
   const scriptLoadedRef = useRef<Record<string, boolean>>({});
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
+  // Intersection Observer cho lazy loading
   useEffect(() => {
-    if (!adRef.current) return;
+    if (!lazyLoadEnabled || shouldLoad) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Delay một chút trước khi load để không làm gián đoạn user
+            setTimeout(() => {
+              setShouldLoad(true);
+            }, delayTime);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: "100px", // Load trước 100px khi scroll đến
+        threshold: 0.1,
+      }
+    );
+
+    if (adRef.current) {
+      observer.observe(adRef.current);
+      observerRef.current = observer;
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [lazyLoadEnabled, delayTime, shouldLoad]);
+
+  // Load ad khi shouldLoad = true
+  useEffect(() => {
+    if (!adRef.current || !shouldLoad) return;
 
     const zone = getAdZone(zoneId);
     if (!zone || !zone.enabled) return;
@@ -38,7 +82,7 @@ export default function AdBanner({
     } else if (network === "adsterra" && adZoneId) {
       loadAdsterra(adRef.current!, adZoneId, format, size || "728x90");
     }
-  }, [zoneId]);
+  }, [zoneId, shouldLoad]);
 
   const loadPropellerAds = (
     container: HTMLElement,
@@ -123,7 +167,6 @@ export default function AdBanner({
     }
   };
 
-  const zone = getAdZone(zoneId);
   const isPlaceholder = !zone || zone.network === "placeholder" || !zone.zoneId;
 
   return (
