@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { sendTelegramNotification, getUserIP } from "@/lib/telegram";
 import { useMode } from "@/lib/mode-context";
 import Header from "@/components/Header";
-import AdPlaceholder from "@/components/AdPlaceholder";
+import AdBanner from "@/components/AdBanner";
 import styles from "@/styles/movie-grid.module.css";
 
 interface Movie {
@@ -612,10 +612,10 @@ export default function MoviesPage() {
       {/* Header */}
       <Header />
 
-      {/* Ad Placeholder - After Header */}
+      {/* Ad Banner - After Header */}
       <div className="w-full bg-dark-900 py-2 px-4">
         <div className="max-w-7xl mx-auto">
-          <AdPlaceholder height="h-20 sm:h-24" label="Banner Quảng Cáo" />
+          <AdBanner zoneId="movies-header" height="h-20 sm:h-24" />
         </div>
       </div>
 
@@ -1041,10 +1041,10 @@ export default function MoviesPage() {
         </section>
       )}
 
-      {/* Ad Placeholder - Between Sections */}
+      {/* Ad Banner - Between Sections */}
       <div className="w-full bg-dark-900 py-4 px-4">
         <div className="max-w-7xl mx-auto">
-          <AdPlaceholder height="h-24 sm:h-32" label="Banner Quảng Cáo" />
+          <AdBanner zoneId="movies-between-sections" height="h-24 sm:h-32" />
         </div>
       </div>
 
@@ -2246,9 +2246,9 @@ export default function MoviesPage() {
             </div>
           )}
 
-          {/* Ad Placeholder - Before Pagination */}
+          {/* Ad Banner - Before Pagination */}
           <div className="w-full py-4">
-            <AdPlaceholder height="h-24 sm:h-32" label="Banner Quảng Cáo" />
+            <AdBanner zoneId="movies-before-pagination" height="h-24 sm:h-32" />
           </div>
 
           {/* Pagination Controls */}

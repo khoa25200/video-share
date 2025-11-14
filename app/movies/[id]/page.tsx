@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Movie } from "@/lib/google-sheets";
 import VideoPlayer from "@/components/VideoPlayer";
-import AdPlaceholder from "@/components/AdPlaceholder";
+import AdBanner from "@/components/AdBanner";
 import { useMode } from "@/lib/mode-context";
 
 interface MovieDetailProps {
@@ -459,8 +459,8 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           {/* Ad Sidebar - Desktop Only */}
           <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 space-y-4">
-              <AdPlaceholder height="h-64" label="Sidebar Quảng Cáo" />
-              <AdPlaceholder height="h-96" label="Sidebar Quảng Cáo" />
+              <AdBanner zoneId="detail-sidebar-top" height="h-64" />
+              <AdBanner zoneId="detail-sidebar-bottom" height="h-96" />
             </div>
           </div>
         </div>
@@ -471,9 +471,9 @@ export default function MovieDetail({ params }: MovieDetailProps) {
           <VideoPlayer movie={movie} />
         </div>
 
-        {/* Ad Placeholder - After Video Player */}
+        {/* Ad Banner - After Video Player */}
         <div className="mt-8">
-          <AdPlaceholder height="h-24 sm:h-32" label="Banner Quảng Cáo" />
+          <AdBanner zoneId="detail-after-video" height="h-24 sm:h-32" />
         </div>
 
         {/* Related Episodes Section */}
