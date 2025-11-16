@@ -1041,12 +1041,16 @@ export default function MoviesPage() {
         </section>
       )}
 
-      {/* Ad Banner - Between Sections - DISABLED */}
-      {/* <div className="w-full bg-dark-900 py-4 px-4">
+      {/* Ad Banner - Between Sections - ENABLED với Zone 10188024 (CPM cao) */}
+      <div className="w-full bg-dark-900 py-4 px-4">
         <div className="max-w-7xl mx-auto">
-          <AdBanner zoneId="movies-between-sections" height="h-24 sm:h-32" />
+          <AdBanner 
+            zoneId="movies-between-sections" 
+            height="h-24 sm:h-32"
+            preload={false} // Lazy load vì không phải above-the-fold
+          />
         </div>
-      </div> */}
+      </div>
 
       {/* Top Ranking Section */}
       {!rankingLoading && topRanking.length > 0 && (

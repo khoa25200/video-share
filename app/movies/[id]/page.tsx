@@ -456,12 +456,16 @@ export default function MovieDetail({ params }: MovieDetailProps) {
             </div>
           </div>
 
-          {/* Ad Sidebar - Desktop Only - DISABLED */}
-          {/* <div className="hidden lg:block lg:col-span-1">
+          {/* Ad Sidebar - Desktop Only - ENABLED với Zone 10188024 (CPM cao) */}
+          <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 space-y-4">
-              <AdBanner zoneId="detail-sidebar-top" height="h-64" />
+              <AdBanner 
+                zoneId="detail-sidebar-top" 
+                height="h-64"
+                preload={true} // Preload vì sidebar thường visible ngay (above-the-fold)
+              />
             </div>
-          </div> */}
+          </div>
         </div>
 
         {/* Video Player Section */}

@@ -3,8 +3,11 @@ import "./globals.css";
 import { ModeProvider } from "@/lib/mode-context";
 import VideoProtection from "@/components/VideoProtection";
 import PropellerAdsScript from "@/components/PropellerAdsScript";
-import PropellerAdsScript2 from "@/components/PropellerAdsScript2";
+// import PropellerAdsScript2 from "@/components/PropellerAdsScript2"; // Tắt - Zone 10188032 có CPM quá thấp ($0.0456)
 import PropellerAdsScript3 from "@/components/PropellerAdsScript3";
+import PropellerAdsScript4 from "@/components/PropellerAdsScript4";
+import PropellerAdsInPagePush from "@/components/PropellerAdsInPagePush";
+import PropellerAdsMultitag from "@/components/PropellerAdsMultitag";
 
 export const metadata: Metadata = {
   title: "GLVIETSUB - Xem Phim Online HD",
@@ -33,16 +36,20 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <head>
-        <script
-          src="https://3nbf4.com/act/files/tag.min.js?z=10188024"
-          data-cfasync="false"
-          async
-        />
+        {/* Zone 10188024 đã được load qua AdBanner components (movies-between-sections, detail-sidebar-top)
+            Xóa script global để tránh duplicate impressions */}
       </head>
       <body className="bg-dark-900 text-white min-h-screen">
+        <PropellerAdsMultitag />
         <PropellerAdsScript />
-        <PropellerAdsScript2 />
+        {/* <PropellerAdsScript2 /> Tắt - Zone 10188032 có CPM quá thấp ($0.0456) */}
         <PropellerAdsScript3 />
+        {/* TODO: Sau 7-14 ngày test, so sánh CPM giữa 2 Vignette zones:
+            - Zone 10188092 (Vignette cũ) - CPM $0.13
+            - Zone 10194906 (Vignette mới) - CPM kỳ vọng $0.40-0.50
+            Tắt zone có CPM thấp hơn */}
+        <PropellerAdsScript4 />
+        <PropellerAdsInPagePush />
         <VideoProtection />
         <ModeProvider>{children}</ModeProvider>
       </body>
