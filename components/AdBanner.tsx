@@ -21,8 +21,9 @@ export default function AdBanner({
   preload = false, // Preload cho above-the-fold ads
 }: AdBannerProps) {
   const zone = getAdZone(zoneId);
-  const lazyLoadEnabled = lazyLoad !== undefined ? lazyLoad : (zone?.lazyLoad ?? true);
-  const delayTime = delay !== undefined ? delay : (zone?.delay ?? 300); // Giảm default delay xuống 300ms
+  const lazyLoadEnabled =
+    lazyLoad !== undefined ? lazyLoad : zone?.lazyLoad ?? true;
+  const delayTime = delay !== undefined ? delay : zone?.delay ?? 300; // Giảm default delay xuống 300ms
   const adRef = useRef<HTMLDivElement>(null);
   const placeholderRef = useRef<HTMLDivElement>(null);
   const [showPlaceholder, setShowPlaceholder] = useState(true);
@@ -80,8 +81,9 @@ export default function AdBanner({
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Giảm delay xuống 0-300ms để tăng viewability
-            const loadDelay = Math.max(0, Math.min(delayTime, 300));
+            // Tối ưu zone 10188024: Giảm delay xuống 0-100ms để tăng tương tác
+            const maxDelay = zone?.zoneId === "10188024" ? 100 : 300;
+            const loadDelay = Math.max(0, Math.min(delayTime, maxDelay));
             setTimeout(() => {
               setShouldLoad(true);
             }, loadDelay);
@@ -90,8 +92,9 @@ export default function AdBanner({
         });
       },
       {
-        rootMargin: "200px", // Tăng lên 200px để preload sớm hơn
-        threshold: 0.01, // Giảm threshold để trigger sớm hơn
+        // Tối ưu zone 10188024: Preload sớm hơn để tăng tương tác
+        rootMargin: zone?.zoneId === "10188024" ? "300px" : "200px", // Zone 10188024 preload sớm hơn 300px
+        threshold: zone?.zoneId === "10188024" ? 0.001 : 0.01, // Zone 10188024 trigger sớm hơn
       }
     );
 
@@ -140,11 +143,17 @@ export default function AdBanner({
     let scriptDomain = "3nbf4.com"; // Default domain
     if (zoneId === "10188024") {
       scriptDomain = "3nbf4.com";
+      // Tối ưu zone 10188024: Preconnect để tăng tốc độ load và tương tác
+      if (!document.querySelector('link[href="https://3nbf4.com"]')) {
+        const preconnect = document.createElement("link");
+        preconnect.rel = "preconnect";
+        preconnect.href = "https://3nbf4.com";
+        preconnect.crossOrigin = "anonymous";
+        document.head.appendChild(preconnect);
+      }
     } else if (zoneId === "10187995") {
       scriptDomain = "al5sm.com";
-    } else if (zoneId === "10188032" || zoneId === "10194910") {
-      scriptDomain = "nap5k.com";
-    } else if (zoneId === "10188092" || zoneId === "10194906") {
+    } else if (zoneId === "10188092") {
       scriptDomain = "gizokraijaw.net";
     }
 
@@ -153,22 +162,58 @@ export default function AdBanner({
       const script = document.createElement("script");
       script.innerHTML = `(function(s){s.dataset.zone='${zoneId}',s.src='https://${scriptDomain}/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`;
       script.setAttribute("data-cfasync", "false");
+
+      // Tối ưu zone 10188024: Load với priority cao hơn
+      if (zoneId === "10188024") {
+        // Thêm fetchpriority cho zone quan trọng
+        script.setAttribute("fetchpriority", "high");
+      }
+
       document.head.appendChild(script);
       scriptLoadedRef.current[`propellerads-${zoneId}`] = true;
+
+      // Tối ưu zone 10188024: Giảm timeout để tăng tương tác
+      const hideTimeout = zoneId === "10188024" ? 500 : 1000;
 
       // Hide placeholder after script loads
       setTimeout(() => {
         if (container.children.length > 0) {
           setShowPlaceholder(false);
+
+          // Track interaction cho zone 10188024
+          if (zoneId === "10188024") {
+            // Track ad loaded event
+            const adElement = container.querySelector(
+              '[data-zone-id="10188024"]'
+            );
+            if (adElement) {
+              // Listen for clicks để track interaction
+              adElement.addEventListener(
+                "click",
+                () => {
+                  // Track click interaction
+                  if (typeof window !== "undefined" && (window as any).gtag) {
+                    (window as any).gtag("event", "ad_click", {
+                      zone_id: "10188024",
+                      format: format,
+                      size: size,
+                    });
+                  }
+                },
+                { once: true }
+              );
+            }
+          }
         }
-      }, 1000);
+      }, hideTimeout);
     } else {
       // Script already loaded, check if ad loaded
+      const checkTimeout = zoneId === "10188024" ? 500 : 1000;
       setTimeout(() => {
         if (container.children.length > 0) {
           setShowPlaceholder(false);
         }
-      }, 1000);
+      }, checkTimeout);
     }
   };
 
@@ -242,4 +287,3 @@ export default function AdBanner({
     </div>
   );
 }
-

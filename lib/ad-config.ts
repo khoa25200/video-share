@@ -42,12 +42,12 @@ export const adZones: Record<string, AdZone> = {
   "movies-between-sections": {
     id: "movies-between-sections",
     network: "propellerads",
-    zoneId: "10188024", // Zone "Wise tag" - CPM cao nhất $0.9201
+    zoneId: "10188024", // Zone "Wise tag" - CPM cao nhất $0.9201 - Tối ưu tương tác
     format: "banner",
     size: "728x90",
     enabled: true, // BẬT - Tăng volume cho zone có CPM cao
     lazyLoad: true, // Lazy load khi scroll đến
-    delay: 200, // Tối ưu: giảm delay xuống 200ms để tăng viewability
+    delay: 100, // Tối ưu tương tác: giảm delay xuống 100ms để load sớm hơn
   },
   "movies-before-pagination": {
     id: "movies-before-pagination",
@@ -60,12 +60,12 @@ export const adZones: Record<string, AdZone> = {
   "detail-sidebar-top": {
     id: "detail-sidebar-top",
     network: "propellerads",
-    zoneId: "10188024", // Zone "Wise tag" - CPM cao nhất $0.9201
+    zoneId: "10188024", // Zone "Wise tag" - CPM cao nhất $0.9201 - Tối ưu tương tác
     format: "sidebar",
     size: "300x250",
     enabled: true, // BẬT - Tăng volume cho zone có CPM cao
     lazyLoad: false, // Preload ngay vì sidebar thường visible ngay (above-the-fold)
-    delay: 0, // Preload ngay lập tức cho above-the-fold
+    delay: 0, // Preload ngay lập tức cho above-the-fold - Tối ưu tương tác
   },
   "detail-sidebar-bottom": {
     id: "detail-sidebar-bottom",

@@ -3,11 +3,15 @@ import "./globals.css";
 import { ModeProvider } from "@/lib/mode-context";
 import VideoProtection from "@/components/VideoProtection";
 import PropellerAdsScript from "@/components/PropellerAdsScript";
-// import PropellerAdsScript2 from "@/components/PropellerAdsScript2"; // Tắt - Zone 10188032 có CPM quá thấp ($0.0456)
-import PropellerAdsScript3 from "@/components/PropellerAdsScript3";
-import PropellerAdsScript4 from "@/components/PropellerAdsScript4";
-import PropellerAdsInPagePush from "@/components/PropellerAdsInPagePush";
+// import PropellerAdsScript2 from "@/components/PropellerAdsScript2"; // REMOVED - Zone 10188032
+// import PropellerAdsScript3 from "@/components/PropellerAdsScript3"; // REMOVED - Zone 10188092 (CPM $0.10 quá thấp)
+// import PropellerAdsScript4 from "@/components/PropellerAdsScript4"; // REMOVED - Zone 10194906
+// import PropellerAdsInPagePush from "@/components/PropellerAdsInPagePush"; // REMOVED - Zone 10194910
 import PropellerAdsMultitag from "@/components/PropellerAdsMultitag";
+import PropellerAdsScript5 from "@/components/PropellerAdsScript5";
+import PropellerAdsScript6 from "@/components/PropellerAdsScript6";
+import PropellerAdsScript7 from "@/components/PropellerAdsScript7";
+import PropellerAdsScript8 from "@/components/PropellerAdsScript8";
 
 export const metadata: Metadata = {
   title: "GLVIETSUB - Xem Phim Online HD",
@@ -38,18 +42,24 @@ export default function RootLayout({
       <head>
         {/* Zone 10188024 đã được load qua AdBanner components (movies-between-sections, detail-sidebar-top)
             Xóa script global để tránh duplicate impressions */}
+        {/* Zone 10203692 - Script tag trong head */}
+        <script
+          src="https://3nbf4.com/act/files/tag.min.js?z=10203692"
+          data-cfasync="false"
+          async
+        />
       </head>
       <body className="bg-dark-900 text-white min-h-screen">
         <PropellerAdsMultitag />
         <PropellerAdsScript />
-        {/* <PropellerAdsScript2 /> Tắt - Zone 10188032 có CPM quá thấp ($0.0456) */}
-        <PropellerAdsScript3 />
-        {/* TODO: Sau 7-14 ngày test, so sánh CPM giữa 2 Vignette zones:
-            - Zone 10188092 (Vignette cũ) - CPM $0.13
-            - Zone 10194906 (Vignette mới) - CPM kỳ vọng $0.40-0.50
-            Tắt zone có CPM thấp hơn */}
-        <PropellerAdsScript4 />
-        <PropellerAdsInPagePush />
+        {/* <PropellerAdsScript2 /> REMOVED - Zone 10188032 */}
+        {/* <PropellerAdsScript3 /> REMOVED - Zone 10188092 (CPM $0.10 quá thấp) */}
+        {/* <PropellerAdsScript4 /> REMOVED - Zone 10194906 */}
+        {/* <PropellerAdsInPagePush /> REMOVED - Zone 10194910 */}
+        <PropellerAdsScript5 />
+        <PropellerAdsScript6 />
+        <PropellerAdsScript7 />
+        <PropellerAdsScript8 />
         <VideoProtection />
         <ModeProvider>{children}</ModeProvider>
       </body>
